@@ -47,17 +47,21 @@ func init() {
 
 func main() {
 	g = gen.NewGenerator(gen.Config{
-		OutPath: "./common/dal/query",
-		Mode:    gen.WithoutContext,
+		OutPath:           "./common/dal/query",
+		Mode:              gen.WithoutContext,
+		FieldNullable:     true,
+		FieldWithIndexTag: true,
 	})
 
 	//dataMap := map[string]func(dtype string) string{
-	//	"smallint":  func(dType string) string { return "int32" },
-	//	"tinyint":   func(dType string) string { return "int32" },
-	//	"mediumint": func(dType string) string { return "int32" },
-	//	"bigint":    func(dType string) string { return "int64" },
+	//	//"smallint":  func(dType string) string { return "int32" },
+	//	//"tinyint":   func(dType string) string { return "int32" },
+	//	//"mediumint": func(dType string) string { return "int32" },
+	//	//"bigint":    func(dType string) string { return "int64" },
+	//	"timestamptz": func(dType string) string { return "sql.NullTime" },
 	//}
 	//g.WithDataTypeMap(dataMap)
+	//g.FieldNullable
 
 	g.UseDB(db)
 	var tableList []string

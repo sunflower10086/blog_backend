@@ -31,7 +31,7 @@ Thumbs.db
 *.key
 *.log
 bin/
-
+log/
 # Develop tools
 .vscode/
 .idea/
