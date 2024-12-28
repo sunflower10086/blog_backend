@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package blog.v1;
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";  // 导入 validate 库
+
+option go_package = "sunflower-blog-svc/api/blog/v1;v1";
+
+// 博客服务定义
+service Poster {
+  // 获取博客列表
+  rpc ListPosts (ListPostsRequest) returns (ListPostsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/posts"
+    };
+  }
+
+  // 获取单个博客详情
+  rpc GetPost (GetPostRequest) returns (Post) {
+    option (google.api.http) = {
+      get: "/api/v1/posts/{post_id}"
+    };
+  }
+}
+
+// 获取博客列表的请求
+message ListPostsRequest {
+  int32 page = 1 [(validate.rules).int32.gt = 0];
+  int32 page_size = 2 [(validate.rules).int32.gt = 0];
+}
+
+// 获取博客列表的响应
+message ListPostsResponse {
+  repeated PostBaseInfo posts = 1;
+  int32 total = 2;
+}
+
+// 获取单个博客的请求
+message GetPostRequest {
+  string post_id = 1 [(validate.rules).string.min_len = 1];
+}
+
+message PostBaseInfo {
+  string id = 1;
+  string title = 2;
+  string cover = 3;
+  repeated string tags = 4;
+  string description = 5;
+  int32 created_at = 6;
+  int32 updated_at = 7;
+  string categories = 8;
+}
+
+// 博客实体
+message Post {
+  PostBaseInfo base_info = 1;
+  string content = 2;
+}
