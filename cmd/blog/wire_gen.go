@@ -24,17 +24,23 @@ import (
 
 // wireApp init kratos application.
 func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*kratos.App, func(), error) {
-	dataData, cleanup, err := data.NewData(confData, logger)
+	db, cleanup, err := data.NewPostgresDB(confData, logger)
 	if err != nil {
 		return nil, nil, err
 	}
+	dataData, cleanup2, err := data.NewData(confData, logger, db)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
 	posterRepo := data.NewPosterRepo(dataData, logger)
-	posterUsecase := biz.NewPosterUseCase(posterRepo, logger)
-	posterService := service.NewPosterService(posterUsecase, logger)
+	posterUseCase := biz.NewPosterUseCase(posterRepo, logger)
+	posterService := service.NewPosterService(posterUseCase, logger)
 	grpcServer := server.NewGRPCServer(confServer, posterService, logger)
 	httpServer := server.NewHTTPServer(confServer, posterService, logger)
 	app := newApp(logger, grpcServer, httpServer)
 	return app, func() {
+		cleanup2()
 		cleanup()
 	}, nil
 }
