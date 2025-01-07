@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.8.3
 // - protoc             v4.25.3
-// source: blog/v1/post.proto
+// source: api/blog/v1/post.proto
 
 package v1
 
@@ -32,7 +32,7 @@ type PosterHTTPServer interface {
 func RegisterPosterHTTPServer(s *http.Server, srv PosterHTTPServer) {
 	r := s.Route("/")
 	r.GET("/api/v1/posts", _Poster_ListPosts0_HTTP_Handler(srv))
-	r.GET("/api/v1/posts/{post_id}", _Poster_GetPost0_HTTP_Handler(srv))
+	r.GET("/api/v1/post/{post_id}", _Poster_GetPost0_HTTP_Handler(srv))
 }
 
 func _Poster_ListPosts0_HTTP_Handler(srv PosterHTTPServer) func(ctx http.Context) error {
@@ -91,7 +91,7 @@ func NewPosterHTTPClient(client *http.Client) PosterHTTPClient {
 
 func (c *PosterHTTPClientImpl) GetPost(ctx context.Context, in *GetPostRequest, opts ...http.CallOption) (*Post, error) {
 	var out Post
-	pattern := "/api/v1/posts/{post_id}"
+	pattern := "/api/v1/post/{post_id}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationPosterGetPost))
 	opts = append(opts, http.PathTemplate(pattern))

@@ -50,5 +50,16 @@ func (s *PosterService) ListPosts(ctx context.Context, req *pb.ListPostsRequest)
 }
 
 func (s *PosterService) GetPost(ctx context.Context, req *pb.GetPostRequest) (*pb.Post, error) {
-	return &pb.Post{}, nil
+	return &pb.Post{
+		BaseInfo: &pb.PostBaseInfo{
+			Title:      "test",
+			Id:         "1",
+			CreatedAt:  int32(time.Now().Unix()),
+			UpdatedAt:  int32(time.Now().Unix()),
+			Tags:       []string{"test", "后端"},
+			Categories: "test",
+			Cover:      "https://hibug.bj.bcebos.com/study-analysis/105217275132383232/105217275132383232_175173842891706368_1_0_1735895898.png",
+		},
+		Content: "test_content",
+	}, nil
 }

@@ -19,7 +19,7 @@ service Poster {
   // 获取单个博客详情
   rpc GetPost (GetPostRequest) returns (Post) {
     option (google.api.http) = {
-      get: "/api/v1/posts/{post_id}"
+      get: "/api/v1/post/{post_id}"
     };
   }
 }
