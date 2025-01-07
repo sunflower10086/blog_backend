@@ -3,7 +3,9 @@ package server
 import (
 	v1 "sunflower-blog-svc/api/blog/v1"
 	"sunflower-blog-svc/internal/conf"
-	"sunflower-blog-svc/internal/service"
+	"sunflower-blog-svc/internal/pkg/middlewares"
+	"sunflower-blog-svc/internal/service/poster"
+	"sunflower-blog-svc/internal/service/user"
 	"sunflower-blog-svc/pkg/middlewares/validate"
 
 	"github.com/HiBugEnterprise/gotools/errorx"
@@ -22,15 +24,19 @@ import (
 )
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(c *conf.Server, poster *service.PosterService, logger log.Logger) *http.Server {
+func NewHTTPServer(bc *conf.Bootstrap, poster *poster.Service, user *user.Service, logger log.Logger) *http.Server {
+	c := bc.Server
+	confJwt := bc.Jwt
 	opts := []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
 			validate.Validator(),
 			selector.Server(recovery.Recovery(), tracing.Server()).Prefix("/api").Build(),
 			logging.Server(logger),
+			middlewares.Jwt(confJwt.GetAccessSecret(), confJwt.GetAccessExpire()),
 		),
 		http.Filter(handlers.CORS(
+			handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization", "AccessToken", "X-Token", "Accept"}),
 			handlers.AllowedOrigins([]string{"*"}),
 			handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS"}),
 		)),
@@ -50,6 +56,7 @@ func NewHTTPServer(c *conf.Server, poster *service.PosterService, logger log.Log
 	srv := http.NewServer(opts...)
 
 	v1.RegisterPosterHTTPServer(srv, poster)
+	v1.RegisterUserHTTPServer(srv, user)
 	return srv
 }
 

@@ -12,7 +12,7 @@ var (
 // ErrUserNotFound = errors.NotFound(v1.ErrorReason_USER_NOT_FOUND.String(), "user not found")
 )
 
-// Post is a Post model.
+// Post is a Post view object.
 type Post struct {
 	Title   string
 	Content string

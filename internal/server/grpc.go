@@ -3,7 +3,7 @@ package server
 import (
 	v1 "sunflower-blog-svc/api/blog/v1"
 	"sunflower-blog-svc/internal/conf"
-	"sunflower-blog-svc/internal/service"
+	"sunflower-blog-svc/internal/service/poster"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
@@ -11,7 +11,7 @@ import (
 )
 
 // NewGRPCServer new a gRPC server.
-func NewGRPCServer(c *conf.Server, poster *service.PosterService, logger log.Logger) *grpc.Server {
+func NewGRPCServer(c *conf.Server, poster *poster.Service, logger log.Logger) *grpc.Server {
 	var opts = []grpc.ServerOption{
 		grpc.Middleware(
 			recovery.Recovery(),

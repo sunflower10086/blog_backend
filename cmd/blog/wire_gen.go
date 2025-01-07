@@ -13,7 +13,8 @@ import (
 	"sunflower-blog-svc/internal/conf"
 	"sunflower-blog-svc/internal/data"
 	"sunflower-blog-svc/internal/server"
-	"sunflower-blog-svc/internal/service"
+	"sunflower-blog-svc/internal/service/poster"
+	"sunflower-blog-svc/internal/service/user"
 )
 
 import (
@@ -23,7 +24,7 @@ import (
 // Injectors from wire.go:
 
 // wireApp init kratos application.
-func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*kratos.App, func(), error) {
+func wireApp(confServer *conf.Server, confData *conf.Data, bootstrap *conf.Bootstrap, logger log.Logger) (*kratos.App, func(), error) {
 	db, cleanup, err := data.NewPostgresDB(confData, logger)
 	if err != nil {
 		return nil, nil, err
@@ -35,9 +36,12 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 	}
 	posterRepo := data.NewPosterRepo(dataData, logger)
 	posterUseCase := biz.NewPosterUseCase(posterRepo, logger)
-	posterService := service.NewPosterService(posterUseCase, logger)
-	grpcServer := server.NewGRPCServer(confServer, posterService, logger)
-	httpServer := server.NewHTTPServer(confServer, posterService, logger)
+	service := poster.NewPosterService(posterUseCase, logger)
+	grpcServer := server.NewGRPCServer(confServer, service, logger)
+	userRepo := data.NewUserRepo(dataData, logger)
+	userUseCase := biz.NewUserUseCase(userRepo, logger)
+	userService := user.NewUserService(logger, userUseCase)
+	httpServer := server.NewHTTPServer(bootstrap, service, userService, logger)
 	app := newApp(logger, grpcServer, httpServer)
 	return app, func() {
 		cleanup2()

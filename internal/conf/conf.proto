@@ -9,6 +9,7 @@ message Bootstrap {
   Server server = 1;
   Data data = 2;
   Log log = 3;
+  Jwt jwt = 4;
 }
 
 message Server {
@@ -77,4 +78,9 @@ message Log {
   //   daily：每天轮换。
   //   size：按大小限制轮换。
   string Rotation = 12;
+}
+
+message Jwt {
+  string AccessSecret = 1;
+  int64 AccessExpire = 2;
 }
