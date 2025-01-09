@@ -16,7 +16,7 @@ import (
 
 	"gorm.io/plugin/dbresolver"
 
-	"sunflower-blog-svc/common/dal/model"
+	"sunflower-blog-svc/internal/data/gormgen/model"
 )
 
 func newPost(db *gorm.DB, opts ...gen.DOOption) post {

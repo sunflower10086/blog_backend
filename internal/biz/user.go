@@ -3,6 +3,7 @@ package biz
 import (
 	"context"
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/pkg/errors"
 )
 
 var (
@@ -12,6 +13,7 @@ var (
 
 type User struct {
 	UserName    string
+	Password    string
 	Description string
 }
 
@@ -20,9 +22,7 @@ type UserRepo interface {
 	Save(context.Context, *User) (*User, error)
 	Update(context.Context, *User) (*User, error)
 	FindByID(context.Context, int64) (*User, error)
-	ListByHello(context.Context, string) ([]*User, error)
-	ListAll(context.Context) ([]*User, error)
-	List(ctx context.Context, pageNum int, pageSize int, tags []string, categories string) ([]*User, int64, error)
+	FindByAccount(ctx context.Context, account string) (*User, error)
 }
 
 // UserUseCase is a User useCase.
@@ -34,4 +34,13 @@ type UserUseCase struct {
 // NewUserUseCase new a User useCase.
 func NewUserUseCase(repo UserRepo, logger log.Logger) *UserUseCase {
 	return &UserUseCase{repo: repo, log: log.NewHelper(logger)}
+}
+
+func (uc *UserUseCase) UserInfoByAccount(ctx context.Context, account string) (*User, error) {
+	userInfo, err := uc.repo.FindByAccount(ctx, account)
+	if err != nil {
+		return nil, errors.Wrap(err, "根据账号查找用户信息失败")
+	}
+
+	return userInfo, nil
 }

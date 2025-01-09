@@ -13,6 +13,10 @@ type userRepo struct {
 	log  *log.Helper
 }
 
+func (u *userRepo) FindByAccount(ctx context.Context, account string) (*biz.User, error) {
+	return nil, nil
+}
+
 func (u *userRepo) Save(ctx context.Context, user *biz.User) (*biz.User, error) {
 	//TODO implement me
 	panic("implement me")
@@ -24,21 +28,6 @@ func (u *userRepo) Update(ctx context.Context, user *biz.User) (*biz.User, error
 }
 
 func (u *userRepo) FindByID(ctx context.Context, i int64) (*biz.User, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (u *userRepo) ListByHello(ctx context.Context, s string) ([]*biz.User, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (u *userRepo) ListAll(ctx context.Context) ([]*biz.User, error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (u *userRepo) List(ctx context.Context, pageNum int, pageSize int, tags []string, categories string) ([]*biz.User, int64, error) {
 	//TODO implement me
 	panic("implement me")
 }

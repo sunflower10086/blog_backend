@@ -7,8 +7,8 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
-	"sunflower-blog-svc/common/dal/query"
 	"sunflower-blog-svc/internal/conf"
+	"sunflower-blog-svc/internal/data/gormgen/query"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"

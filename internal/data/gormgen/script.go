@@ -26,28 +26,11 @@ func init() {
 	if db, err = gorm.Open(postgres.New(postgresConf)); err != nil {
 		log.Fatal("opens database failed: ", err)
 	}
-
 }
-
-//func configLog(mod bool, batchSize int) (c *gorm.Config) {
-//	c = &gorm.Config{
-//		Logger:                                   logger.Default.LogMode(logger.Silent),
-//		DisableForeignKeyConstraintWhenMigrating: true,
-//		NamingStrategy: schema.NamingStrategy{
-//			SingularTable: true, // 表名不加复数形式，false默认加
-//		},
-//		CreateBatchSize: batchSize,
-//	}
-//
-//	if mod {
-//		c.Logger = logger.Default.LogMode(logger.Info)
-//	}
-//	return
-//}
 
 func main() {
 	g = gen.NewGenerator(gen.Config{
-		OutPath:           "./common/dal/query",
+		OutPath:           "./query",
 		Mode:              gen.WithoutContext,
 		FieldNullable:     true,
 		FieldWithIndexTag: true,
