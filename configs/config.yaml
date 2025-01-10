@@ -49,6 +49,6 @@ log:
   #   size：按大小限制轮换。
   Rotation: size
 
-Jwt:
+jwt:
   AccessSecret: sunflower-blog
   AccessExpire: 3600000000000

@@ -85,7 +85,7 @@ components:
         LoginRequest:
             type: object
             properties:
-                username:
+                account:
                     type: string
                 password:
                     type: string

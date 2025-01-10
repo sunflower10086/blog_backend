@@ -2,6 +2,7 @@ package biz
 
 import (
 	"context"
+	"fmt"
 	"github.com/HiBugEnterprise/gotools/errorx"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/pkg/errors"
@@ -14,13 +15,14 @@ import (
 )
 
 var (
-	// ErrUserNotFound is user not found.
+	// WrongUserNameOrPassword is user not found.
 	WrongUserNameOrPassword = errorx.New("biz user", int(codex.CodeWrongUserNameOrPassword), codex.CodeWrongUserNameOrPassword.Msg()).Show()
 )
 
 type User struct {
 	Id          int64
 	UserName    string
+	Account     string
 	Password    string
 	Description string
 }
@@ -76,6 +78,7 @@ func (uu *UserUseCase) Login(ctx context.Context, account, password string) (tok
 		return nil, WrongUserNameOrPassword
 	}
 
+	fmt.Println(uu.jwtConf.AccessExpire)
 	// 生成 token
 	iat := time.Now().Unix()
 	exp := iat + uu.jwtConf.AccessExpire
@@ -96,4 +99,21 @@ func (uu *UserUseCase) Login(ctx context.Context, account, password string) (tok
 	}
 
 	return token, nil
+}
+
+func (uu *UserUseCase) Register(ctx context.Context, account, password string) error {
+
+	hashPwd := encrypt.PasswordHash(password)
+	user := &User{
+		Account:     account,
+		Password:    hashPwd,
+		Description: account,
+	}
+
+	_, err := uu.userRepo.Save(ctx, user)
+	if err != nil {
+		return errorx.Internal(err, "注册用户失败")
+	}
+
+	return nil
 }

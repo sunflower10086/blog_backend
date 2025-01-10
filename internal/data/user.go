@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 	"sunflower-blog-svc/internal/biz"
+	"sunflower-blog-svc/internal/data/gormgen/model"
 )
 
 var _ biz.UserRepo = (*userRepo)(nil)
@@ -27,15 +28,29 @@ func (u *userRepo) FindByAccount(ctx context.Context, account string) (*biz.User
 	}
 
 	replyUser := &biz.User{
-		Id: user.ID,
+		Id:       user.ID,
+		UserName: user.Username,
+		Account:  user.Account,
+		Password: user.Password,
 	}
 
 	return replyUser, nil
 }
 
 func (u *userRepo) Save(ctx context.Context, user *biz.User) (*biz.User, error) {
-	//TODO implement me
-	panic("implement me")
+	userQuery := u.data.DB.User.WithContext(ctx)
+	userModel := &model.User{
+		Account:     user.Account,
+		Description: user.Description,
+		Password:    user.Password,
+		Username:    user.UserName,
+	}
+
+	if err := userQuery.Save(userModel); err != nil {
+		return nil, errors.Wrap(err, "创建用户失败")
+	}
+
+	return nil, nil
 }
 
 func (u *userRepo) Update(ctx context.Context, user *biz.User) (*biz.User, error) {
