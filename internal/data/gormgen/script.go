@@ -31,7 +31,7 @@ func init() {
 func main() {
 	g = gen.NewGenerator(gen.Config{
 		OutPath:           "./query",
-		Mode:              gen.WithoutContext,
+		Mode:              gen.WithoutContext | gen.WithQueryInterface,
 		FieldNullable:     true,
 		FieldWithIndexTag: true,
 	})

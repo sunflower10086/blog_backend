@@ -3,6 +3,8 @@ package data
 import (
 	"context"
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/pkg/errors"
+	"gorm.io/gorm"
 	"sunflower-blog-svc/internal/biz"
 )
 
@@ -14,7 +16,21 @@ type userRepo struct {
 }
 
 func (u *userRepo) FindByAccount(ctx context.Context, account string) (*biz.User, error) {
-	return nil, nil
+	userQuery := u.data.DB.User
+	user, err := userQuery.WithContext(ctx).Where(userQuery.Account.Eq(account)).First()
+
+	switch {
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		return nil, err
+	case err != nil:
+		return nil, err
+	}
+
+	replyUser := &biz.User{
+		Id: user.ID,
+	}
+
+	return replyUser, nil
 }
 
 func (u *userRepo) Save(ctx context.Context, user *biz.User) (*biz.User, error) {

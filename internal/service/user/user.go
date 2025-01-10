@@ -5,7 +5,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"sunflower-blog-svc/internal/biz"
 
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/emptypb"
 	pb "sunflower-blog-svc/api/blog/v1"
 )
 
@@ -25,10 +25,16 @@ func NewUserService(logger log.Logger, userUc *biz.UserUseCase) *Service {
 
 func (s *Service) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginReply, error) {
 	// 1.查询用户信息
-	s.userUc.
-	// 2.判断密码是否正确
-	// 3.生成 token
-	return &pb.LoginReply{}, nil
+	token, err := s.userUc.Login(ctx, req.Username, req.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	loginReply := &pb.LoginReply{
+		Token: token.AccessToken,
+	}
+
+	return loginReply, nil
 }
 func (s *Service) Logout(ctx context.Context, req *emptypb.Empty) (*emptypb.Empty, error) {
 	return &emptypb.Empty{}, nil

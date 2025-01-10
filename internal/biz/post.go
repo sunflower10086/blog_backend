@@ -18,7 +18,7 @@ type Post struct {
 	Content string
 }
 
-// PosterRepo is a Greater repo.
+// PosterRepo is a Greater userRepo.
 type PosterRepo interface {
 	Save(context.Context, *Post) (*Post, error)
 	Update(context.Context, *Post) (*Post, error)

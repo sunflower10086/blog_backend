@@ -57,8 +57,8 @@ func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 }
 
 type queryCtx struct {
-	Post *postDo
-	User *userDo
+	Post IPostDo
+	User IUserDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {

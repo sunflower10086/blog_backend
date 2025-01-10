@@ -6,9 +6,9 @@ import (
 )
 
 type Payload struct {
-	Uid string
+	Uid int64
 	Iat int64 // issued at，unix timestamp，token颁发时间
-	Exp int64
+	Exp int64 // token 的到期时间
 }
 
 func GenJwtToken(secretKey string, payload *Payload) (string, error) {

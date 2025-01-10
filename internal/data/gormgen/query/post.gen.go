@@ -100,99 +100,160 @@ func (p post) replaceDB(db *gorm.DB) post {
 
 type postDo struct{ gen.DO }
 
-func (p postDo) Debug() *postDo {
+type IPostDo interface {
+	gen.SubQuery
+	Debug() IPostDo
+	WithContext(ctx context.Context) IPostDo
+	WithResult(fc func(tx gen.Dao)) gen.ResultInfo
+	ReplaceDB(db *gorm.DB)
+	ReadDB() IPostDo
+	WriteDB() IPostDo
+	As(alias string) gen.Dao
+	Session(config *gorm.Session) IPostDo
+	Columns(cols ...field.Expr) gen.Columns
+	Clauses(conds ...clause.Expression) IPostDo
+	Not(conds ...gen.Condition) IPostDo
+	Or(conds ...gen.Condition) IPostDo
+	Select(conds ...field.Expr) IPostDo
+	Where(conds ...gen.Condition) IPostDo
+	Order(conds ...field.Expr) IPostDo
+	Distinct(cols ...field.Expr) IPostDo
+	Omit(cols ...field.Expr) IPostDo
+	Join(table schema.Tabler, on ...field.Expr) IPostDo
+	LeftJoin(table schema.Tabler, on ...field.Expr) IPostDo
+	RightJoin(table schema.Tabler, on ...field.Expr) IPostDo
+	Group(cols ...field.Expr) IPostDo
+	Having(conds ...gen.Condition) IPostDo
+	Limit(limit int) IPostDo
+	Offset(offset int) IPostDo
+	Count() (count int64, err error)
+	Scopes(funcs ...func(gen.Dao) gen.Dao) IPostDo
+	Unscoped() IPostDo
+	Create(values ...*model.Post) error
+	CreateInBatches(values []*model.Post, batchSize int) error
+	Save(values ...*model.Post) error
+	First() (*model.Post, error)
+	Take() (*model.Post, error)
+	Last() (*model.Post, error)
+	Find() ([]*model.Post, error)
+	FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*model.Post, err error)
+	FindInBatches(result *[]*model.Post, batchSize int, fc func(tx gen.Dao, batch int) error) error
+	Pluck(column field.Expr, dest interface{}) error
+	Delete(...*model.Post) (info gen.ResultInfo, err error)
+	Update(column field.Expr, value interface{}) (info gen.ResultInfo, err error)
+	UpdateSimple(columns ...field.AssignExpr) (info gen.ResultInfo, err error)
+	Updates(value interface{}) (info gen.ResultInfo, err error)
+	UpdateColumn(column field.Expr, value interface{}) (info gen.ResultInfo, err error)
+	UpdateColumnSimple(columns ...field.AssignExpr) (info gen.ResultInfo, err error)
+	UpdateColumns(value interface{}) (info gen.ResultInfo, err error)
+	UpdateFrom(q gen.SubQuery) gen.Dao
+	Attrs(attrs ...field.AssignExpr) IPostDo
+	Assign(attrs ...field.AssignExpr) IPostDo
+	Joins(fields ...field.RelationField) IPostDo
+	Preload(fields ...field.RelationField) IPostDo
+	FirstOrInit() (*model.Post, error)
+	FirstOrCreate() (*model.Post, error)
+	FindByPage(offset int, limit int) (result []*model.Post, count int64, err error)
+	ScanByPage(result interface{}, offset int, limit int) (count int64, err error)
+	Scan(result interface{}) (err error)
+	Returning(value interface{}, columns ...string) IPostDo
+	UnderlyingDB() *gorm.DB
+	schema.Tabler
+}
+
+func (p postDo) Debug() IPostDo {
 	return p.withDO(p.DO.Debug())
 }
 
-func (p postDo) WithContext(ctx context.Context) *postDo {
+func (p postDo) WithContext(ctx context.Context) IPostDo {
 	return p.withDO(p.DO.WithContext(ctx))
 }
 
-func (p postDo) ReadDB() *postDo {
+func (p postDo) ReadDB() IPostDo {
 	return p.Clauses(dbresolver.Read)
 }
 
-func (p postDo) WriteDB() *postDo {
+func (p postDo) WriteDB() IPostDo {
 	return p.Clauses(dbresolver.Write)
 }
 
-func (p postDo) Session(config *gorm.Session) *postDo {
+func (p postDo) Session(config *gorm.Session) IPostDo {
 	return p.withDO(p.DO.Session(config))
 }
 
-func (p postDo) Clauses(conds ...clause.Expression) *postDo {
+func (p postDo) Clauses(conds ...clause.Expression) IPostDo {
 	return p.withDO(p.DO.Clauses(conds...))
 }
 
-func (p postDo) Returning(value interface{}, columns ...string) *postDo {
+func (p postDo) Returning(value interface{}, columns ...string) IPostDo {
 	return p.withDO(p.DO.Returning(value, columns...))
 }
 
-func (p postDo) Not(conds ...gen.Condition) *postDo {
+func (p postDo) Not(conds ...gen.Condition) IPostDo {
 	return p.withDO(p.DO.Not(conds...))
 }
 
-func (p postDo) Or(conds ...gen.Condition) *postDo {
+func (p postDo) Or(conds ...gen.Condition) IPostDo {
 	return p.withDO(p.DO.Or(conds...))
 }
 
-func (p postDo) Select(conds ...field.Expr) *postDo {
+func (p postDo) Select(conds ...field.Expr) IPostDo {
 	return p.withDO(p.DO.Select(conds...))
 }
 
-func (p postDo) Where(conds ...gen.Condition) *postDo {
+func (p postDo) Where(conds ...gen.Condition) IPostDo {
 	return p.withDO(p.DO.Where(conds...))
 }
 
-func (p postDo) Exists(subquery interface{ UnderlyingDB() *gorm.DB }) *postDo {
+func (p postDo) Exists(subquery interface{ UnderlyingDB() *gorm.DB }) IPostDo {
 	return p.Where(field.CompareSubQuery(field.ExistsOp, nil, subquery.UnderlyingDB()))
 }
 
-func (p postDo) Order(conds ...field.Expr) *postDo {
+func (p postDo) Order(conds ...field.Expr) IPostDo {
 	return p.withDO(p.DO.Order(conds...))
 }
 
-func (p postDo) Distinct(cols ...field.Expr) *postDo {
+func (p postDo) Distinct(cols ...field.Expr) IPostDo {
 	return p.withDO(p.DO.Distinct(cols...))
 }
 
-func (p postDo) Omit(cols ...field.Expr) *postDo {
+func (p postDo) Omit(cols ...field.Expr) IPostDo {
 	return p.withDO(p.DO.Omit(cols...))
 }
 
-func (p postDo) Join(table schema.Tabler, on ...field.Expr) *postDo {
+func (p postDo) Join(table schema.Tabler, on ...field.Expr) IPostDo {
 	return p.withDO(p.DO.Join(table, on...))
 }
 
-func (p postDo) LeftJoin(table schema.Tabler, on ...field.Expr) *postDo {
+func (p postDo) LeftJoin(table schema.Tabler, on ...field.Expr) IPostDo {
 	return p.withDO(p.DO.LeftJoin(table, on...))
 }
 
-func (p postDo) RightJoin(table schema.Tabler, on ...field.Expr) *postDo {
+func (p postDo) RightJoin(table schema.Tabler, on ...field.Expr) IPostDo {
 	return p.withDO(p.DO.RightJoin(table, on...))
 }
 
-func (p postDo) Group(cols ...field.Expr) *postDo {
+func (p postDo) Group(cols ...field.Expr) IPostDo {
 	return p.withDO(p.DO.Group(cols...))
 }
 
-func (p postDo) Having(conds ...gen.Condition) *postDo {
+func (p postDo) Having(conds ...gen.Condition) IPostDo {
 	return p.withDO(p.DO.Having(conds...))
 }
 
-func (p postDo) Limit(limit int) *postDo {
+func (p postDo) Limit(limit int) IPostDo {
 	return p.withDO(p.DO.Limit(limit))
 }
 
-func (p postDo) Offset(offset int) *postDo {
+func (p postDo) Offset(offset int) IPostDo {
 	return p.withDO(p.DO.Offset(offset))
 }
 
-func (p postDo) Scopes(funcs ...func(gen.Dao) gen.Dao) *postDo {
+func (p postDo) Scopes(funcs ...func(gen.Dao) gen.Dao) IPostDo {
 	return p.withDO(p.DO.Scopes(funcs...))
 }
 
-func (p postDo) Unscoped() *postDo {
+func (p postDo) Unscoped() IPostDo {
 	return p.withDO(p.DO.Unscoped())
 }
 
@@ -258,22 +319,22 @@ func (p postDo) FindInBatches(result *[]*model.Post, batchSize int, fc func(tx g
 	return p.DO.FindInBatches(result, batchSize, fc)
 }
 
-func (p postDo) Attrs(attrs ...field.AssignExpr) *postDo {
+func (p postDo) Attrs(attrs ...field.AssignExpr) IPostDo {
 	return p.withDO(p.DO.Attrs(attrs...))
 }
 
-func (p postDo) Assign(attrs ...field.AssignExpr) *postDo {
+func (p postDo) Assign(attrs ...field.AssignExpr) IPostDo {
 	return p.withDO(p.DO.Assign(attrs...))
 }
 
-func (p postDo) Joins(fields ...field.RelationField) *postDo {
+func (p postDo) Joins(fields ...field.RelationField) IPostDo {
 	for _, _f := range fields {
 		p = *p.withDO(p.DO.Joins(_f))
 	}
 	return &p
 }
 
-func (p postDo) Preload(fields ...field.RelationField) *postDo {
+func (p postDo) Preload(fields ...field.RelationField) IPostDo {
 	for _, _f := range fields {
 		p = *p.withDO(p.DO.Preload(_f))
 	}
