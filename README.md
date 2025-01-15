@@ -49,3 +49,8 @@ docker build -t <your-docker-image-name> .
 docker run --rm -p 8000:8000 -p 9000:9000 -v </path/to/your/configs>:/data/conf <your-docker-image-name>
 ```
 
+项目分为两部分：
+1. 不同博客展示部分
+   1. 展示博客
+   2. 展示默认的 admin 用户信息
+2. admin 端，管理帖子的增删改
