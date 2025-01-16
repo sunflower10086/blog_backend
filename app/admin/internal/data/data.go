@@ -3,8 +3,6 @@ package data
 import (
 	"context"
 	"database/sql"
-	"fmt"
-
 	"sunflower-blog-svc/app/admin/internal/conf"
 	"sunflower-blog-svc/app/admin/internal/data/gormgen/query"
 
