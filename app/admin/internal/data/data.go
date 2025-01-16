@@ -1,20 +1,28 @@
 package data
 
 import (
+	"context"
 	"database/sql"
+	"fmt"
+
+	"sunflower-blog-svc/app/admin/internal/conf"
+	"sunflower-blog-svc/app/admin/internal/data/gormgen/query"
+
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/go-kratos/kratos/v2/middleware/recovery"
+	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/google/wire"
 	"github.com/pkg/errors"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
-	"sunflower-blog-svc/app/admin/internal/conf"
-	"sunflower-blog-svc/app/admin/internal/data/gormgen/query"
+
+	postpb "sunflower-blog-svc/api/blog/v1"
 )
 
 // ProviderSet is data providers.
-var ProviderSet = wire.NewSet(NewData, NewPostgresDB, NewUserRepo)
+var ProviderSet = wire.NewSet(NewData, NewPostgresDB, NewUserRepo, NewPosterServiceClient)
 
 // Data .
 type Data struct {
@@ -73,4 +81,19 @@ func configLog(mod bool, batchSize int) (c *gorm.Config) {
 		c.Logger = logger.Default.LogMode(logger.Info)
 	}
 	return
+}
+
+func NewPosterServiceClient() (postpb.PosterClient, error) {
+	conn, err := grpc.DialInsecure(
+		context.Background(),
+		grpc.WithEndpoint("127.0.0.1:8000"),
+		grpc.WithMiddleware(
+			recovery.Recovery(),
+		),
+	)
+	if err != nil {
+		return nil, err
+	}
+	cli := postpb.NewPosterClient(conn)
+	return cli, nil
 }

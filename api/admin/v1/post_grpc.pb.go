@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v4.25.3
-// source: api/blog/v1/post.proto
+// source: api/admin/v1/post.proto
 
 package v1
 
@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,24 +20,22 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Poster_CreatePost_FullMethodName = "/blog.v1.Poster/CreatePost"
-	Poster_UpdatePost_FullMethodName = "/blog.v1.Poster/UpdatePost"
-	Poster_ListPosts_FullMethodName  = "/blog.v1.Poster/ListPosts"
-	Poster_GetPost_FullMethodName    = "/blog.v1.Poster/GetPost"
+	Poster_CreatePost_FullMethodName = "/api.admin.v1.Poster/CreatePost"
+	Poster_UpdatePost_FullMethodName = "/api.admin.v1.Poster/UpdatePost"
+	Poster_DeletePost_FullMethodName = "/api.admin.v1.Poster/DeletePost"
+	Poster_GetPost_FullMethodName    = "/api.admin.v1.Poster/GetPost"
+	Poster_ListPost_FullMethodName   = "/api.admin.v1.Poster/ListPost"
 )
 
 // PosterClient is the client API for Poster service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// 博客服务定义
 type PosterClient interface {
 	CreatePost(ctx context.Context, in *CreatePostRequest, opts ...grpc.CallOption) (*Post, error)
 	UpdatePost(ctx context.Context, in *UpdatePostRequest, opts ...grpc.CallOption) (*Post, error)
-	// 获取博客列表
-	ListPosts(ctx context.Context, in *ListPostsRequest, opts ...grpc.CallOption) (*ListPostsResponse, error)
-	// 获取单个博客详情
+	DeletePost(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetPost(ctx context.Context, in *GetPostRequest, opts ...grpc.CallOption) (*Post, error)
+	ListPost(ctx context.Context, in *ListPostsRequest, opts ...grpc.CallOption) (*ListPostsResponse, error)
 }
 
 type posterClient struct {
@@ -67,10 +66,10 @@ func (c *posterClient) UpdatePost(ctx context.Context, in *UpdatePostRequest, op
 	return out, nil
 }
 
-func (c *posterClient) ListPosts(ctx context.Context, in *ListPostsRequest, opts ...grpc.CallOption) (*ListPostsResponse, error) {
+func (c *posterClient) DeletePost(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListPostsResponse)
-	err := c.cc.Invoke(ctx, Poster_ListPosts_FullMethodName, in, out, cOpts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Poster_DeletePost_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -87,18 +86,25 @@ func (c *posterClient) GetPost(ctx context.Context, in *GetPostRequest, opts ...
 	return out, nil
 }
 
+func (c *posterClient) ListPost(ctx context.Context, in *ListPostsRequest, opts ...grpc.CallOption) (*ListPostsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListPostsResponse)
+	err := c.cc.Invoke(ctx, Poster_ListPost_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PosterServer is the server API for Poster service.
 // All implementations must embed UnimplementedPosterServer
 // for forward compatibility.
-//
-// 博客服务定义
 type PosterServer interface {
 	CreatePost(context.Context, *CreatePostRequest) (*Post, error)
 	UpdatePost(context.Context, *UpdatePostRequest) (*Post, error)
-	// 获取博客列表
-	ListPosts(context.Context, *ListPostsRequest) (*ListPostsResponse, error)
-	// 获取单个博客详情
+	DeletePost(context.Context, *DeletePostRequest) (*emptypb.Empty, error)
 	GetPost(context.Context, *GetPostRequest) (*Post, error)
+	ListPost(context.Context, *ListPostsRequest) (*ListPostsResponse, error)
 	mustEmbedUnimplementedPosterServer()
 }
 
@@ -115,11 +121,14 @@ func (UnimplementedPosterServer) CreatePost(context.Context, *CreatePostRequest)
 func (UnimplementedPosterServer) UpdatePost(context.Context, *UpdatePostRequest) (*Post, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdatePost not implemented")
 }
-func (UnimplementedPosterServer) ListPosts(context.Context, *ListPostsRequest) (*ListPostsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListPosts not implemented")
+func (UnimplementedPosterServer) DeletePost(context.Context, *DeletePostRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeletePost not implemented")
 }
 func (UnimplementedPosterServer) GetPost(context.Context, *GetPostRequest) (*Post, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPost not implemented")
+}
+func (UnimplementedPosterServer) ListPost(context.Context, *ListPostsRequest) (*ListPostsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListPost not implemented")
 }
 func (UnimplementedPosterServer) mustEmbedUnimplementedPosterServer() {}
 func (UnimplementedPosterServer) testEmbeddedByValue()                {}
@@ -178,20 +187,20 @@ func _Poster_UpdatePost_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Poster_ListPosts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListPostsRequest)
+func _Poster_DeletePost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeletePostRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PosterServer).ListPosts(ctx, in)
+		return srv.(PosterServer).DeletePost(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Poster_ListPosts_FullMethodName,
+		FullMethod: Poster_DeletePost_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PosterServer).ListPosts(ctx, req.(*ListPostsRequest))
+		return srv.(PosterServer).DeletePost(ctx, req.(*DeletePostRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -214,11 +223,29 @@ func _Poster_GetPost_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Poster_ListPost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListPostsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PosterServer).ListPost(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Poster_ListPost_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PosterServer).ListPost(ctx, req.(*ListPostsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Poster_ServiceDesc is the grpc.ServiceDesc for Poster service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Poster_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "blog.v1.Poster",
+	ServiceName: "api.admin.v1.Poster",
 	HandlerType: (*PosterServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -230,14 +257,18 @@ var Poster_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Poster_UpdatePost_Handler,
 		},
 		{
-			MethodName: "ListPosts",
-			Handler:    _Poster_ListPosts_Handler,
+			MethodName: "DeletePost",
+			Handler:    _Poster_DeletePost_Handler,
 		},
 		{
 			MethodName: "GetPost",
 			Handler:    _Poster_GetPost_Handler,
 		},
+		{
+			MethodName: "ListPost",
+			Handler:    _Poster_ListPost_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "api/blog/v1/post.proto",
+	Metadata: "api/admin/v1/post.proto",
 }

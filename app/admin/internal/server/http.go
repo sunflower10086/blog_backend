@@ -2,19 +2,37 @@ package server
 
 import (
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/go-kratos/kratos/v2/middleware/logging"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
+	"github.com/go-kratos/kratos/v2/middleware/selector"
+	"github.com/go-kratos/kratos/v2/middleware/tracing"
 	"github.com/go-kratos/kratos/v2/transport/http"
+	"github.com/gorilla/handlers"
 	pb "sunflower-blog-svc/api/admin/v1"
 	"sunflower-blog-svc/app/admin/internal/conf"
+	"sunflower-blog-svc/app/admin/internal/pkg/middlewares"
 	"sunflower-blog-svc/app/admin/internal/service"
+	"sunflower-blog-svc/pkg/httpencoder"
+	"sunflower-blog-svc/pkg/middlewares/validate"
 )
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(c *conf.Server, user *service.UserService, logger log.Logger) *http.Server {
-	var opts = []http.ServerOption{
+func NewHTTPServer(bc *conf.Bootstrap, user *service.UserService, poster *service.PosterService, logger log.Logger) *http.Server {
+	c := bc.Server
+	confJwt := bc.Jwt
+	opts := []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
+			validate.Validator(),
+			selector.Server(recovery.Recovery(), tracing.Server()).Prefix("/api").Build(),
+			logging.Server(logger),
+			middlewares.Jwt(confJwt.GetAccessSecret(), confJwt.GetAccessExpire()),
 		),
+		http.Filter(handlers.CORS(
+			handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization", "AccessToken", "X-Token", "Accept"}),
+			handlers.AllowedOrigins([]string{"*"}),
+			handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS"}),
+		)),
 	}
 	if c.Http.Network != "" {
 		opts = append(opts, http.Network(c.Http.Network))
@@ -25,7 +43,12 @@ func NewHTTPServer(c *conf.Server, user *service.UserService, logger log.Logger)
 	if c.Http.Timeout != nil {
 		opts = append(opts, http.Timeout(c.Http.Timeout.AsDuration()))
 	}
+
+	opts = append(opts, http.ResponseEncoder(httpencoder.SuccessEncoder))
+	opts = append(opts, http.ErrorEncoder(httpencoder.ErrorEncoder))
 	srv := http.NewServer(opts...)
+
 	pb.RegisterUserHTTPServer(srv, user)
+	pb.RegisterPosterHTTPServer(srv, poster)
 	return srv
 }

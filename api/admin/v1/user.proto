@@ -1,13 +1,13 @@
 syntax = "proto3";
 
-package api.blog.v1;
+package api.admin.v1;
 
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
-option go_package = "sunflower-blog-svc/api/blog/v1;v1";
+option go_package = "sunflower-blog-svc/api/admin/v1;v1";
 option java_multiple_files = true;
-option java_package = "api.blog.v1";
+option java_package = "api.admin.v1";
 
 service User {
 	rpc Login (LoginRequest) returns (LoginReply) {

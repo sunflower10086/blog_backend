@@ -12,8 +12,7 @@ import (
 )
 
 var noNeedLogin = map[string]struct{}{
-	v1.OperationUserLogin:  {},
-	v1.OperationUserLogout: {},
+	v1.OperationUserLogin: {},
 }
 
 var ErrUnauthorized = errorx.Unauthorized("UNAUTHORIZED_INFO_MISSING", "授权已过期或授权异常,请重新授权").Show()

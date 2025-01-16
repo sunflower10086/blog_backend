@@ -24,7 +24,17 @@ func NewUserService(logger log.Logger, userUc *biz.UserUseCase) *UserService {
 }
 
 func (s *UserService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginReply, error) {
-	return &pb.LoginReply{}, nil
+	// 1.查询用户信息
+	token, err := s.userUc.Login(ctx, req.Account, req.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	loginReply := &pb.LoginReply{
+		Token: token.AccessToken,
+	}
+
+	return loginReply, nil
 }
 func (s *UserService) Logout(ctx context.Context, req *emptypb.Empty) (*emptypb.Empty, error) {
 	return &emptypb.Empty{}, nil

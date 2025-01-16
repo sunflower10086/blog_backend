@@ -2,7 +2,6 @@ package biz
 
 import (
 	"context"
-	"fmt"
 	"github.com/HiBugEnterprise/gotools/errorx"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/pkg/errors"
@@ -78,7 +77,6 @@ func (uu *UserUseCase) Login(ctx context.Context, account, password string) (tok
 		return nil, WrongUserNameOrPassword
 	}
 
-	fmt.Println(uu.jwtConf.AccessExpire)
 	// 生成 token
 	iat := time.Now().Unix()
 	exp := iat + uu.jwtConf.AccessExpire

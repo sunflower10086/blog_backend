@@ -4,11 +4,18 @@ package blog.v1;
 
 import "google/api/annotations.proto";
 import "validate/validate.proto";  // 导入 validate 库
+import "google/protobuf/empty.proto";
 
 option go_package = "sunflower-blog-svc/api/blog/v1;v1";
 
 // 博客服务定义
 service Poster {
+  rpc CreatePost (CreatePostRequest) returns (Post);
+
+  rpc UpdatePost (UpdatePostRequest) returns (Post);
+
+  rpc DeletePost (DeletePostRequest) returns (google.protobuf.Empty);
+
   // 获取博客列表
   rpc ListPosts (ListPostsRequest) returns (ListPostsResponse) {
     option (google.api.http) = {
@@ -56,4 +63,16 @@ message PostBaseInfo {
 message Post {
   PostBaseInfo base_info = 1;
   string content = 2;
+}
+
+message CreatePostRequest {
+  Post post = 1 [(validate.rules).message.required = true];
+}
+
+message UpdatePostRequest {
+  Post post = 1 [(validate.rules).message.required = true];
+}
+
+message DeletePostRequest {
+  string post_id = 1 [(validate.rules).string.min_len = 1];
 }

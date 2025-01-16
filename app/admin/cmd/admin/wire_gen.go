@@ -37,7 +37,14 @@ func wireApp(confServer *conf.Server, confData *conf.Data, bootstrap *conf.Boots
 	userUseCase := biz.NewUserUseCase(userRepo, logger, jwt)
 	userService := service.NewUserService(logger, userUseCase)
 	grpcServer := server.NewGRPCServer(confServer, userService, logger)
-	httpServer := server.NewHTTPServer(confServer, userService, logger)
+	posterClient, err := data.NewPosterServiceClient()
+	if err != nil {
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	posterService := service.NewPosterService(posterClient)
+	httpServer := server.NewHTTPServer(bootstrap, userService, posterService, logger)
 	app := newApp(logger, grpcServer, httpServer)
 	return app, func() {
 		cleanup2()
