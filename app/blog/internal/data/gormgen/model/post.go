@@ -24,3 +24,8 @@ type Post struct {
 func (*Post) TableName() string {
 	return TableNamePost
 }
+
+func (p *Post) AfterFind(tx *gorm.DB) error {
+	// todo: 使用 file-key 去 oss 请求图片
+	return nil
+}

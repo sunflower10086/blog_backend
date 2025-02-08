@@ -3,6 +3,7 @@ package data
 import (
 	"context"
 	"database/sql"
+
 	"sunflower-blog-svc/app/admin/internal/conf"
 	"sunflower-blog-svc/app/admin/internal/data/gormgen/query"
 
@@ -20,7 +21,7 @@ import (
 )
 
 // ProviderSet is data providers.
-var ProviderSet = wire.NewSet(NewData, NewPostgresDB, NewUserRepo, NewPosterServiceClient)
+var ProviderSet = wire.NewSet(NewData, NewPostgresDB, NewUserRepo, NewPostRepo, NewPosterServiceClient)
 
 // Data .
 type Data struct {
