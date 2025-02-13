@@ -16,7 +16,7 @@ import (
 
 	"gorm.io/plugin/dbresolver"
 
-	"sunflower-blog-svc/app/admin/internal/data/gormgen/model"
+	"sunflower-blog-svc/app/blog/internal/data/gormgen/model"
 )
 
 func newUser(db *gorm.DB, opts ...gen.DOOption) user {

@@ -4,9 +4,9 @@ import (
 	"context"
 	"github.com/go-kratos/kratos/v2/log"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"sunflower-blog-svc/app/admin/internal/biz"
+	"sunflower-blog-svc/app/blog/internal/biz"
 
-	pb "sunflower-blog-svc/api/admin/v1"
+	pb "sunflower-blog-svc/api/blog/v1"
 )
 
 type UserService struct {

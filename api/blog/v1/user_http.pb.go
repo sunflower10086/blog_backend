@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.8.3
 // - protoc             v4.25.3
-// source: api/admin/v1/user.proto
+// source: user.proto
 
 package v1
 
@@ -20,9 +20,9 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
-const OperationUserLogin = "/api.blog.v1.User/Login"
-const OperationUserLogout = "/api.blog.v1.User/Logout"
-const OperationUserUserInfo = "/api.blog.v1.User/UserInfo"
+const OperationUserLogin = "/api.admin.v1.User/Login"
+const OperationUserLogout = "/api.admin.v1.User/Logout"
+const OperationUserUserInfo = "/api.admin.v1.User/UserInfo"
 
 type UserHTTPServer interface {
 	Login(context.Context, *LoginRequest) (*LoginReply, error)

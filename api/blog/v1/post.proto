@@ -10,11 +10,25 @@ option go_package = "sunflower-blog-svc/api/blog/v1;v1";
 
 // 博客服务定义
 service Poster {
-  rpc CreatePost (CreatePostRequest) returns (Post);
+  rpc CreatePost (CreatePostRequest) returns (Post){
+    option (google.api.http) = {
+      post: "/api/v1/post"
+      body: "*"
+    };
+  };
 
-  rpc UpdatePost (UpdatePostRequest) returns (Post);
+  rpc UpdatePost (UpdatePostRequest) returns (Post){
+    option (google.api.http) = {
+      put: "/api/v1/post"
+      body: "*"
+    };
+  };
 
-  rpc DeletePost (DeletePostRequest) returns (google.protobuf.Empty);
+  rpc DeletePost (DeletePostRequest) returns (google.protobuf.Empty){
+    option (google.api.http) = {
+      delete: "/api/v1/post/{post_id}"
+    };
+  };
 
   // 获取博客列表
   rpc ListPosts (ListPostsRequest) returns (ListPostsResponse) {

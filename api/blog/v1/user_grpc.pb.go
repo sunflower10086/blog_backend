@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v4.25.3
-// source: api/admin/v1/user.proto
+// source: user.proto
 
 package v1
 
@@ -20,9 +20,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	User_Login_FullMethodName    = "/api.blog.v1.User/Login"
-	User_Logout_FullMethodName   = "/api.blog.v1.User/Logout"
-	User_UserInfo_FullMethodName = "/api.blog.v1.User/UserInfo"
+	User_Login_FullMethodName    = "/api.admin.v1.User/Login"
+	User_Logout_FullMethodName   = "/api.admin.v1.User/Logout"
+	User_UserInfo_FullMethodName = "/api.admin.v1.User/UserInfo"
 )
 
 // UserClient is the client API for User service.
@@ -177,7 +177,7 @@ func _User_UserInfo_Handler(srv interface{}, ctx context.Context, dec func(inter
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var User_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "api.blog.v1.User",
+	ServiceName: "api.admin.v1.User",
 	HandlerType: (*UserServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -194,5 +194,5 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "api/admin/v1/user.proto",
+	Metadata: "user.proto",
 }

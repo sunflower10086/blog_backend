@@ -12,8 +12,7 @@ import (
 )
 
 var noNeedLogin = map[string]struct{}{
-	//v1.OperationUserLogin:       {},
-	//v1.OperationUserLogout:      {},
+	v1.OperationUserLogin:       {},
 	v1.OperationPosterListPosts: {},
 	v1.OperationPosterGetPost:   {},
 }

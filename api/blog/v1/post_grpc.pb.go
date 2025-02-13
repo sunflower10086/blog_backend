@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v4.25.3
-// source: api/blog/v1/post.proto
+// source: post.proto
 
 package v1
 
@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -21,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	Poster_CreatePost_FullMethodName = "/blog.v1.Poster/CreatePost"
 	Poster_UpdatePost_FullMethodName = "/blog.v1.Poster/UpdatePost"
+	Poster_DeletePost_FullMethodName = "/blog.v1.Poster/DeletePost"
 	Poster_ListPosts_FullMethodName  = "/blog.v1.Poster/ListPosts"
 	Poster_GetPost_FullMethodName    = "/blog.v1.Poster/GetPost"
 )
@@ -33,6 +35,7 @@ const (
 type PosterClient interface {
 	CreatePost(ctx context.Context, in *CreatePostRequest, opts ...grpc.CallOption) (*Post, error)
 	UpdatePost(ctx context.Context, in *UpdatePostRequest, opts ...grpc.CallOption) (*Post, error)
+	DeletePost(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// 获取博客列表
 	ListPosts(ctx context.Context, in *ListPostsRequest, opts ...grpc.CallOption) (*ListPostsResponse, error)
 	// 获取单个博客详情
@@ -67,6 +70,16 @@ func (c *posterClient) UpdatePost(ctx context.Context, in *UpdatePostRequest, op
 	return out, nil
 }
 
+func (c *posterClient) DeletePost(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Poster_DeletePost_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *posterClient) ListPosts(ctx context.Context, in *ListPostsRequest, opts ...grpc.CallOption) (*ListPostsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListPostsResponse)
@@ -95,6 +108,7 @@ func (c *posterClient) GetPost(ctx context.Context, in *GetPostRequest, opts ...
 type PosterServer interface {
 	CreatePost(context.Context, *CreatePostRequest) (*Post, error)
 	UpdatePost(context.Context, *UpdatePostRequest) (*Post, error)
+	DeletePost(context.Context, *DeletePostRequest) (*emptypb.Empty, error)
 	// 获取博客列表
 	ListPosts(context.Context, *ListPostsRequest) (*ListPostsResponse, error)
 	// 获取单个博客详情
@@ -114,6 +128,9 @@ func (UnimplementedPosterServer) CreatePost(context.Context, *CreatePostRequest)
 }
 func (UnimplementedPosterServer) UpdatePost(context.Context, *UpdatePostRequest) (*Post, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdatePost not implemented")
+}
+func (UnimplementedPosterServer) DeletePost(context.Context, *DeletePostRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeletePost not implemented")
 }
 func (UnimplementedPosterServer) ListPosts(context.Context, *ListPostsRequest) (*ListPostsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListPosts not implemented")
@@ -178,6 +195,24 @@ func _Poster_UpdatePost_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Poster_DeletePost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeletePostRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PosterServer).DeletePost(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Poster_DeletePost_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PosterServer).DeletePost(ctx, req.(*DeletePostRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Poster_ListPosts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListPostsRequest)
 	if err := dec(in); err != nil {
@@ -230,6 +265,10 @@ var Poster_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Poster_UpdatePost_Handler,
 		},
 		{
+			MethodName: "DeletePost",
+			Handler:    _Poster_DeletePost_Handler,
+		},
+		{
 			MethodName: "ListPosts",
 			Handler:    _Poster_ListPosts_Handler,
 		},
@@ -239,5 +278,5 @@ var Poster_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "api/blog/v1/post.proto",
+	Metadata: "post.proto",
 }

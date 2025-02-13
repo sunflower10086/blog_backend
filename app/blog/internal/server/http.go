@@ -3,6 +3,7 @@ package server
 import (
 	v1 "sunflower-blog-svc/api/blog/v1"
 	"sunflower-blog-svc/app/blog/internal/conf"
+	"sunflower-blog-svc/app/blog/internal/pkg/middlewares"
 	"sunflower-blog-svc/app/blog/internal/service"
 	"sunflower-blog-svc/pkg/httpencoder"
 	"sunflower-blog-svc/pkg/middlewares/validate"
@@ -17,14 +18,21 @@ import (
 )
 
 // NewHTTPServer new an HTTP server.
-func NewHTTPServer(bc *conf.Bootstrap, poster *service.PosterService, logger log.Logger) *http.Server {
+func NewHTTPServer(
+	bc *conf.Bootstrap,
+	user *service.UserService,
+	poster *service.PosterService,
+	logger log.Logger,
+) *http.Server {
 	c := bc.Server
+	confJwt := bc.Jwt
 	opts := []http.ServerOption{
 		http.Middleware(
 			recovery.Recovery(),
 			validate.Validator(),
 			selector.Server(recovery.Recovery(), tracing.Server()).Prefix("/api").Build(),
 			logging.Server(logger),
+			middlewares.Jwt(confJwt.GetAccessSecret(), confJwt.GetAccessExpire()),
 		),
 		http.Filter(handlers.CORS(
 			handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization", "AccessToken", "X-Token", "Accept"}),
@@ -47,5 +55,6 @@ func NewHTTPServer(bc *conf.Bootstrap, poster *service.PosterService, logger log
 	srv := http.NewServer(opts...)
 
 	v1.RegisterPosterHTTPServer(srv, poster)
+	v1.RegisterUserHTTPServer(srv, user)
 	return srv
 }

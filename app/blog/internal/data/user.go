@@ -5,8 +5,8 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
-	"sunflower-blog-svc/app/admin/internal/biz"
-	"sunflower-blog-svc/app/admin/internal/data/gormgen/model"
+	"sunflower-blog-svc/app/blog/internal/biz"
+	"sunflower-blog-svc/app/blog/internal/data/gormgen/model"
 )
 
 var _ biz.UserRepo = (*userRepo)(nil)
@@ -67,6 +67,6 @@ func (u *userRepo) FindByID(ctx context.Context, i int64) (*biz.User, error) {
 func NewUserRepo(data *Data, logger log.Logger) biz.UserRepo {
 	return &userRepo{
 		data: data,
-		log:  log.NewHelper(logger),
+		log:  log.NewHelper(log.With(logger, "module", "data/user")),
 	}
 }

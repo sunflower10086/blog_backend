@@ -17,7 +17,7 @@ type posterRepo struct {
 func NewPosterRepo(data *Data, logger log.Logger) biz.PosterRepo {
 	return &posterRepo{
 		data: data,
-		log:  log.NewHelper(logger),
+		log:  log.NewHelper(log.With(logger, "module", "data/post")),
 	}
 }
 
