@@ -1,6 +1,7 @@
 package model
 
 import (
+	"sunflower-blog-svc/app/blog/internal/biz"
 	"time"
 
 	"gorm.io/gorm"
@@ -28,4 +29,12 @@ func (*Post) TableName() string {
 func (p *Post) AfterFind(tx *gorm.DB) error {
 	// todo: 使用 file-key 去 oss 请求图片
 	return nil
+}
+
+func (p *Post) ConverterBizPost() *biz.Post {
+	return &biz.Post{
+		Id:      p.ID,
+		Title:   p.Title,
+		Content: p.Content,
+	}
 }

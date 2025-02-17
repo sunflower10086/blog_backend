@@ -63,7 +63,7 @@ message GetPostRequest {
 }
 
 message PostBaseInfo {
-  string id = 1;
+  int32 id = 1;
   string title = 2;
   string cover = 3;
   repeated string tags = 4;
@@ -80,7 +80,12 @@ message Post {
 }
 
 message CreatePostRequest {
-  Post post = 1 [(validate.rules).message.required = true];
+  string title = 1;
+  string cover = 2;
+  repeated string tags = 3;
+  string description = 4;
+  string categories = 5;
+  string content = 6;
 }
 
 message UpdatePostRequest {

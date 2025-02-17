@@ -4,37 +4,10 @@
 openapi: 3.0.3
 info:
     title: Poster API
+    description: 博客服务定义
     version: 0.0.1
 paths:
     /api/v1/post:
-        get:
-            tags:
-                - Poster
-            operationId: Poster_ListPost
-            parameters:
-                - name: page
-                  in: query
-                  schema:
-                    type: integer
-                    format: int32
-                - name: pageSize
-                  in: query
-                  schema:
-                    type: integer
-                    format: int32
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/ListPostsResponse'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
         put:
             tags:
                 - Poster
@@ -85,6 +58,7 @@ paths:
         get:
             tags:
                 - Poster
+            description: 获取单个博客详情
             operationId: Poster_GetPost
             parameters:
                 - name: postId
@@ -125,13 +99,55 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+    /api/v1/posts:
+        get:
+            tags:
+                - Poster
+            description: 获取博客列表
+            operationId: Poster_ListPosts
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListPostsResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
 components:
     schemas:
         CreatePostRequest:
             type: object
             properties:
-                post:
-                    $ref: '#/components/schemas/Post'
+                title:
+                    type: string
+                cover:
+                    type: string
+                tags:
+                    type: array
+                    items:
+                        type: string
+                description:
+                    type: string
+                categories:
+                    type: string
+                content:
+                    type: string
         GoogleProtobufAny:
             type: object
             properties:
@@ -163,7 +179,8 @@ components:
             type: object
             properties:
                 id:
-                    type: string
+                    type: integer
+                    format: int32
                 title:
                     type: string
                 cover:

@@ -5,7 +5,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"strconv"
 	"time"
 
 	"sunflower-blog-svc/app/blog/internal/biz"
@@ -39,7 +38,7 @@ func (s *PosterService) ListPosts(ctx context.Context, req *pb.ListPostsRequest)
 	for _, post := range posts {
 		postBaseInfoList = append(postBaseInfoList, &pb.PostBaseInfo{
 			Title:     post.Title,
-			Id:        strconv.Itoa(1),
+			Id:        1,
 			CreatedAt: int32(time.Now().Unix()),
 			UpdatedAt: int32(time.Now().Unix()),
 			Tags:      []string{"test", "后端"},
@@ -57,7 +56,7 @@ func (s *PosterService) GetPost(ctx context.Context, req *pb.GetPostRequest) (*p
 	return &pb.Post{
 		BaseInfo: &pb.PostBaseInfo{
 			Title:      "test",
-			Id:         "1",
+			Id:         1,
 			CreatedAt:  int32(time.Now().Unix()),
 			UpdatedAt:  int32(time.Now().Unix()),
 			Tags:       []string{"test", "后端"},
@@ -69,8 +68,33 @@ func (s *PosterService) GetPost(ctx context.Context, req *pb.GetPostRequest) (*p
 }
 
 func (s *PosterService) CreatePost(ctx context.Context, req *pb.CreatePostRequest) (*pb.Post, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreatePost not implemented")
+	bizPost := &biz.Post{
+		Title:   req.Title,
+		Content: req.Content,
+		//Cover:      req.Post.BaseInfo.Cover,
+		//Tags:       req.Post.BaseInfo.Tags,
+		//Categories: req.Post.BaseInfo.Categories,
+	}
+	post, err := s.uc.CreatePost(ctx, bizPost)
+	if err != nil {
+		return nil, err
+
+	}
+
+	resp := &pb.Post{
+		BaseInfo: &pb.PostBaseInfo{
+			Title:      post.Title,
+			Id:         int32(post.Id),
+			CreatedAt:  int32(time.Now().Unix()),
+			UpdatedAt:  int32(time.Now().Unix()),
+			Tags:       []string{"test", "后端"},
+			Categories: "test",
+			Cover:      "https://hibug.bj.bcebos.com/study-analysis/105217275132383232/105217275132383232_175173842",
+		},
+	}
+	return resp, nil
 }
+
 func (s *PosterService) UpdatePost(ctx context.Context, req *pb.UpdatePostRequest) (*pb.Post, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdatePost not implemented")
 }

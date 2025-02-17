@@ -43,7 +43,7 @@ func setUserInfo() middleware.Middleware {
 	}
 }
 
-func Jwt(accessKey string, accessExpire int64) middleware.Middleware {
+func Jwt(accessKey string) middleware.Middleware {
 	return selector.Server(
 		jwt.Server(func(token *jwt2.Token) (interface{}, error) { return []byte(accessKey), nil },
 			jwt.WithSigningMethod(jwt2.SigningMethodHS256),

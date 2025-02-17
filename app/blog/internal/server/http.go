@@ -32,7 +32,7 @@ func NewHTTPServer(
 			validate.Validator(),
 			selector.Server(recovery.Recovery(), tracing.Server()).Prefix("/api").Build(),
 			logging.Server(logger),
-			middlewares.Jwt(confJwt.GetAccessSecret(), confJwt.GetAccessExpire()),
+			middlewares.Jwt(confJwt.GetAccessSecret()),
 		),
 		http.Filter(handlers.CORS(
 			handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization", "AccessToken", "X-Token", "Accept"}),

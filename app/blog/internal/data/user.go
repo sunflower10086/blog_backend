@@ -40,6 +40,7 @@ func (u *userRepo) FindByAccount(ctx context.Context, account string) (*biz.User
 func (u *userRepo) Save(ctx context.Context, user *biz.User) (*biz.User, error) {
 	userQuery := u.data.DB.User.WithContext(ctx)
 	userModel := &model.User{
+		ID:          user.Id,
 		Account:     user.Account,
 		Description: user.Description,
 		Password:    user.Password,

@@ -14,6 +14,7 @@ var (
 
 // Post is a Post view object.
 type Post struct {
+	Id      int64
 	Title   string
 	Content string
 }
@@ -26,6 +27,7 @@ type PosterRepo interface {
 	ListByHello(context.Context, string) ([]*Post, error)
 	ListAll(context.Context) ([]*Post, error)
 	List(ctx context.Context, pageNum int, pageSize int, tags []string, categories string) ([]*Post, int64, error)
+	Create(ctx context.Context, post *Post) (*Post, error)
 }
 
 // PosterUseCase is a Post useCase.
@@ -46,4 +48,16 @@ func (uc *PosterUseCase) Posts(ctx context.Context, pageNum, pageSize int, tags 
 	}
 
 	return posts, count, nil
+}
+
+func (uc *PosterUseCase) CreatePost(ctx context.Context, post *Post) (*Post, error) {
+	post, err := uc.repo.Create(ctx, post)
+	if err != nil {
+		err = errorx.Internal(err, "创建帖子失败").WithMetadata(errorx.Metadata{
+			"post": *post,
+		})
+		return nil, err
+	}
+
+	return post, nil
 }

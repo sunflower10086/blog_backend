@@ -26,7 +26,7 @@ log:
   # 输出格式 json, plain, 默认 json
   #   json：使用 JSON 编码。
   #   plain：使用纯文本编码，通常在开发过程中使用。
-  Encoding: plain
+  Encoding: json
   # 日志文件路径
   Path: ../../logs/
   # 日志级别 debug,info,error,severe, 默认 info
