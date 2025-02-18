@@ -127,13 +127,27 @@ func newLogger(c *conf.Log) (log.Logger, error) {
 
 		// 创建自定义 core
 		var encoder zapcore.Encoder
-		if c.GetEncoding() == "console" {
-			encoder = zapcore.NewConsoleEncoder(zapConf.EncoderConfig)
+		switch c.GetEncoding() {
+		//case "console":
+		//	encoder = zapcore.NewConsoleEncoder(zapConf.EncoderConfig)
+		case "json":
+			encoder = zapcore.NewJSONEncoder(zapConf.EncoderConfig)
+		case "plain":
+			// 创建纯净版编码配置（无时间戳/调用栈/级别等信息）
+			plainConfig := zapConf.EncoderConfig
+			plainConfig.TimeKey = ""       // 移除时间戳
+			plainConfig.LevelKey = ""      // 移除日志级别
+			plainConfig.CallerKey = ""     // 移除调用位置
+			plainConfig.StacktraceKey = "" // 移除堆栈跟踪
+			plainConfig.NameKey = ""       // 移除日志器名称
+
+			// 使用控制台编码器（无结构化字段）
+			encoder = zapcore.NewConsoleEncoder(plainConfig)
+		default:
+			// 处理未知编码格式
+			return nil, fmt.Errorf("unsupported encoding: %s", c.GetEncoding())
 		}
 
-		if c.GetEncoding() == "json" {
-			encoder = zapcore.NewJSONEncoder(zapConf.EncoderConfig)
-		}
 		core := zapcore.NewCore(
 			encoder,
 			zapcore.AddSync(logRotate),
