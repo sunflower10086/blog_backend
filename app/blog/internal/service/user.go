@@ -2,9 +2,13 @@ package service
 
 import (
 	"context"
+
+	"sunflower-blog-svc/app/blog/internal/biz"
+	"sunflower-blog-svc/app/blog/internal/pkg/ctxdata"
+
+	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/log"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"sunflower-blog-svc/app/blog/internal/biz"
 
 	pb "sunflower-blog-svc/api/blog/v1"
 )
@@ -36,9 +40,27 @@ func (s *UserService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Logi
 
 	return loginReply, nil
 }
+
 func (s *UserService) Logout(ctx context.Context, req *emptypb.Empty) (*emptypb.Empty, error) {
 	return &emptypb.Empty{}, nil
 }
+
 func (s *UserService) UserInfo(ctx context.Context, req *emptypb.Empty) (*pb.UserInfoReply, error) {
-	return &pb.UserInfoReply{}, nil
+	uid, err := ctxdata.GetUid(ctx)
+	if err != nil {
+		err = errors.New(500, "获取用户信息失败", "获取用户信息失败")
+		return nil, err
+	}
+
+	userInfo, err := s.userUc.UserInfoById(ctx, uid)
+	if err != nil {
+		return nil, err
+	}
+
+	userInfoReply := &pb.UserInfoReply{
+		Username: userInfo.UserName,
+		Email:    userInfo.Account,
+		Avatar:   "",
+	}
+	return userInfoReply, nil
 }

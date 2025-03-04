@@ -2,13 +2,15 @@ package middlewares
 
 import (
 	"context"
+
+	v1 "sunflower-blog-svc/api/blog/v1"
+	"sunflower-blog-svc/app/blog/internal/pkg/ctxdata"
+
 	"github.com/HiBugEnterprise/gotools/errorx"
 	"github.com/go-kratos/kratos/v2/middleware"
 	"github.com/go-kratos/kratos/v2/middleware/auth/jwt"
 	"github.com/go-kratos/kratos/v2/middleware/selector"
 	jwt2 "github.com/golang-jwt/jwt/v5"
-	v1 "sunflower-blog-svc/api/blog/v1"
-	"sunflower-blog-svc/app/blog/internal/pkg/ctxdata"
 )
 
 var noNeedLogin = map[string]struct{}{
@@ -37,7 +39,7 @@ func setUserInfo() middleware.Middleware {
 				return nil, ErrUnauthorized
 			}
 			claimInfo := claim.(jwt2.MapClaims)
-			ctx = context.WithValue(ctx, ctxdata.CtxKeyUid, claimInfo["uid"])
+			ctx = context.WithValue(ctx, ctxdata.CtxKeyUid, claimInfo[ctxdata.CtxKeyUid])
 			return handler(ctx, req)
 		}
 	}

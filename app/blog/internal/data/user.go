@@ -2,11 +2,13 @@ package data
 
 import (
 	"context"
+
+	"sunflower-blog-svc/app/blog/internal/biz"
+	"sunflower-blog-svc/app/blog/internal/data/gormgen/model"
+
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
-	"sunflower-blog-svc/app/blog/internal/biz"
-	"sunflower-blog-svc/app/blog/internal/data/gormgen/model"
 )
 
 var _ biz.UserRepo = (*userRepo)(nil)
@@ -55,13 +57,28 @@ func (u *userRepo) Save(ctx context.Context, user *biz.User) (*biz.User, error) 
 }
 
 func (u *userRepo) Update(ctx context.Context, user *biz.User) (*biz.User, error) {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 
 func (u *userRepo) FindByID(ctx context.Context, i int64) (*biz.User, error) {
-	//TODO implement me
-	panic("implement me")
+	userQuery := u.data.DB.User
+	user, err := userQuery.WithContext(ctx).Where(userQuery.ID.Eq(i)).First()
+
+	switch err {
+	case nil:
+		resp := &biz.User{
+			Id:       user.ID,
+			UserName: user.Username,
+			Account:  user.Account,
+			Password: user.Password,
+		}
+		return resp, nil
+	case gorm.ErrRecordNotFound:
+		return nil, nil
+	default:
+		return nil, errors.Wrap(err, "根据用户ID查询用户信息失败")
+	}
 }
 
 // NewUserRepo .

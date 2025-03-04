@@ -3,8 +3,7 @@
 
 openapi: 3.0.3
 info:
-    title: Poster API
-    description: 博客服务定义
+    title: ""
     version: 0.0.1
 paths:
     /api/v1/post:
@@ -16,7 +15,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/UpdatePostRequest'
+                            $ref: '#/components/schemas/blog.v1.UpdatePostRequest'
                 required: true
             responses:
                 "200":
@@ -24,13 +23,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Post'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
+                                $ref: '#/components/schemas/blog.v1.Post'
         post:
             tags:
                 - Poster
@@ -39,7 +32,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreatePostRequest'
+                            $ref: '#/components/schemas/blog.v1.CreatePostRequest'
                 required: true
             responses:
                 "200":
@@ -47,13 +40,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Post'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
+                                $ref: '#/components/schemas/blog.v1.Post'
     /api/v1/post/{postId}:
         get:
             tags:
@@ -72,13 +59,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Post'
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
+                                $ref: '#/components/schemas/blog.v1.Post'
         delete:
             tags:
                 - Poster
@@ -93,12 +74,6 @@ paths:
                 "200":
                     description: OK
                     content: {}
-                default:
-                    description: Default error response
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/Status'
     /api/v1/posts:
         get:
             tags:
@@ -122,16 +97,74 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ListPostsResponse'
-                default:
-                    description: Default error response
+                                $ref: '#/components/schemas/blog.v1.ListPostsResponse'
+    /api/v1/user:
+        get:
+            tags:
+                - User
+            operationId: User_UserInfo
+            responses:
+                "200":
+                    description: OK
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Status'
+                                $ref: '#/components/schemas/api.admin.v1.UserInfoReply'
+    /api/v1/user/login:
+        post:
+            tags:
+                - User
+            operationId: User_Login
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.admin.v1.LoginRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.v1.LoginReply'
+    /api/v1/user/logout:
+        post:
+            tags:
+                - User
+            operationId: User_Logout
+            requestBody:
+                content:
+                    application/json: {}
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
 components:
     schemas:
-        CreatePostRequest:
+        api.admin.v1.LoginReply:
+            type: object
+            properties:
+                token:
+                    type: string
+        api.admin.v1.LoginRequest:
+            type: object
+            properties:
+                account:
+                    type: string
+                password:
+                    type: string
+        api.admin.v1.UserInfoReply:
+            type: object
+            properties:
+                username:
+                    type: string
+                email:
+                    type: string
+                avatar:
+                    type: string
+        blog.v1.CreatePostRequest:
             type: object
             properties:
                 title:
@@ -148,34 +181,26 @@ components:
                     type: string
                 content:
                     type: string
-        GoogleProtobufAny:
-            type: object
-            properties:
-                '@type':
-                    type: string
-                    description: The type of the serialized message.
-            additionalProperties: true
-            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
-        ListPostsResponse:
+        blog.v1.ListPostsResponse:
             type: object
             properties:
                 posts:
                     type: array
                     items:
-                        $ref: '#/components/schemas/PostBaseInfo'
+                        $ref: '#/components/schemas/blog.v1.PostBaseInfo'
                 total:
                     type: integer
                     format: int32
             description: 获取博客列表的响应
-        Post:
+        blog.v1.Post:
             type: object
             properties:
                 baseInfo:
-                    $ref: '#/components/schemas/PostBaseInfo'
+                    $ref: '#/components/schemas/blog.v1.PostBaseInfo'
                 content:
                     type: string
             description: 博客实体
-        PostBaseInfo:
+        blog.v1.PostBaseInfo:
             type: object
             properties:
                 id:
@@ -199,26 +224,12 @@ components:
                     format: int32
                 categories:
                     type: string
-        Status:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
-                    format: int32
-                message:
-                    type: string
-                    description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
-                details:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/GoogleProtobufAny'
-                    description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
-            description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
-        UpdatePostRequest:
+        blog.v1.UpdatePostRequest:
             type: object
             properties:
                 post:
-                    $ref: '#/components/schemas/Post'
+                    $ref: '#/components/schemas/blog.v1.Post'
 tags:
     - name: Poster
+      description: 博客服务定义
+    - name: User

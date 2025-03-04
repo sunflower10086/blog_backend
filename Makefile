@@ -28,9 +28,9 @@ init:
 .PHONY: config
 # generate internal proto
 config:
-	protoc --proto_path=./internal \
+	protoc --proto_path=./app/blog/internal \
 	       --proto_path=./third_party \
- 	       --go_out=paths=source_relative:./internal \
+ 	       --go_out=paths=source_relative:./app/blog/internal \
 	       $(INTERNAL_PROTO_FILES)
 
 .PHONY: api

@@ -17,26 +17,32 @@ import (
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
-		db:   db,
-		Post: newPost(db, opts...),
-		User: newUser(db, opts...),
+		db:      db,
+		Post:    newPost(db, opts...),
+		PostTag: newPostTag(db, opts...),
+		Tag:     newTag(db, opts...),
+		User:    newUser(db, opts...),
 	}
 }
 
 type Query struct {
 	db *gorm.DB
 
-	Post post
-	User user
+	Post    post
+	PostTag postTag
+	Tag     tag
+	User    user
 }
 
 func (q *Query) Available() bool { return q.db != nil }
 
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
-		db:   db,
-		Post: q.Post.clone(db),
-		User: q.User.clone(db),
+		db:      db,
+		Post:    q.Post.clone(db),
+		PostTag: q.PostTag.clone(db),
+		Tag:     q.Tag.clone(db),
+		User:    q.User.clone(db),
 	}
 }
 
@@ -50,21 +56,27 @@ func (q *Query) WriteDB() *Query {
 
 func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
-		db:   db,
-		Post: q.Post.replaceDB(db),
-		User: q.User.replaceDB(db),
+		db:      db,
+		Post:    q.Post.replaceDB(db),
+		PostTag: q.PostTag.replaceDB(db),
+		Tag:     q.Tag.replaceDB(db),
+		User:    q.User.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
-	Post IPostDo
-	User IUserDo
+	Post    IPostDo
+	PostTag IPostTagDo
+	Tag     ITagDo
+	User    IUserDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
-		Post: q.Post.WithContext(ctx),
-		User: q.User.WithContext(ctx),
+		Post:    q.Post.WithContext(ctx),
+		PostTag: q.PostTag.WithContext(ctx),
+		Tag:     q.Tag.WithContext(ctx),
+		User:    q.User.WithContext(ctx),
 	}
 }
 

@@ -37,12 +37,12 @@ func main() {
 	})
 
 	g.UseDB(db)
-	db.AutoMigrate(&model.Post{}, &model.User{})
+	db.AutoMigrate(&model.Post{}, &model.User{}, model.PostTag{}, model.Tag{})
 
 	// tableList = relationship(tableList) //需要处理关系的表
 
 	// 其他默认的表
-	g.ApplyBasic(model.Post{}, model.User{})
+	g.ApplyBasic(model.Post{}, model.User{}, model.PostTag{}, model.Tag{})
 	// g.ApplyInterface(func(CommonDao) {}, g.GenerateModel("la_user"))
 	g.Execute()
 }

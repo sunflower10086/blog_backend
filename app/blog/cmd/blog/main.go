@@ -2,11 +2,13 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"github.com/go-kratos/kratos/contrib/log/zap/v2"
 	"os"
+	"path/filepath"
 	"strings"
+
 	"sunflower-blog-svc/app/blog/internal/conf"
+
+	"github.com/go-kratos/kratos/contrib/log/zap/v2"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
@@ -71,7 +73,7 @@ func main() {
 		panic(err)
 	}
 
-	outputLogger, err := newLogger(bc.Log)
+	outputLogger, err := newLogger(bc.Log, bc.Server.GetMode())
 	if err != nil {
 		panic(err)
 	}
@@ -98,77 +100,28 @@ func main() {
 	}
 }
 
-func newLogger(c *conf.Log) (log.Logger, error) {
-	zapConf := uberzap.NewProductionConfig()
-	zapConf.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-
-	var logger log.Logger
-
-	if c.GetMode() == "file" {
-		fmt.Println("Log Mode: file")
-		// 创建日志目录
-		if err := os.MkdirAll(c.GetPath(), 0o755); err != nil {
+func newLogger(c *conf.Log, svcMode string) (log.Logger, error) {
+	var (
+		logger log.Logger
+		core   zapcore.Core
+		err    error
+	)
+	switch c.GetMode() {
+	case "file":
+		core, err = getFileZapCore(c)
+		if err != nil {
 			return nil, err
 		}
-
-		// 配置日志输出到文件
-		zapConf.OutputPaths = []string{c.GetPath() + "/app.log"}
-		zapConf.ErrorOutputPaths = []string{c.GetPath() + "/error.log"}
-
-		// 设置日志分割
-		// 注意：需要引入 "gopkg.in/natefinch/lumberjack.v2"
-		logRotate := &lumberjack.Logger{
-			Filename:   c.GetPath() + "/app.log",
-			MaxSize:    int(c.MaxSize),    // 每个日志文件最大尺寸，单位 MB
-			MaxBackups: int(c.MaxBackups), // 保留的旧文件最大数量
-			MaxAge:     int(c.KeepDays),   // 保留的最大天数
-			Compress:   c.Compress,        // 是否压缩
+	case "console":
+		core, err = getConsoleZapCore(c)
+		if err != nil {
+			return nil, err
 		}
-
-		// 创建自定义 core
-		var encoder zapcore.Encoder
-		switch c.GetEncoding() {
-		//case "console":
-		//	encoder = zapcore.NewConsoleEncoder(zapConf.EncoderConfig)
-		case "json":
-			encoder = zapcore.NewJSONEncoder(zapConf.EncoderConfig)
-		case "plain":
-			// 创建纯净版编码配置（无时间戳/调用栈/级别等信息）
-			plainConfig := zapConf.EncoderConfig
-			plainConfig.TimeKey = ""       // 移除时间戳
-			plainConfig.LevelKey = ""      // 移除日志级别
-			plainConfig.CallerKey = ""     // 移除调用位置
-			plainConfig.StacktraceKey = "" // 移除堆栈跟踪
-			plainConfig.NameKey = ""       // 移除日志器名称
-
-			// 使用控制台编码器（无结构化字段）
-			encoder = zapcore.NewConsoleEncoder(plainConfig)
-		default:
-			// 处理未知编码格式
-			return nil, fmt.Errorf("unsupported encoding: %s", c.GetEncoding())
-		}
-
-		core := zapcore.NewCore(
-			encoder,
-			zapcore.AddSync(logRotate),
-			uberzap.NewAtomicLevelAt(getZapLevel(c.GetLevel())),
-		)
-
-		logger = zap.NewLogger(uberzap.New(core, uberzap.AddCaller(), uberzap.AddCallerSkip(2)))
-
-		return logger, nil
 	}
 
-	// 默认输出到控制台
-	zapConf.OutputPaths = []string{"stdout"}
-	zapConf.ErrorOutputPaths = []string{"stderr"}
+	logger = zap.NewLogger(uberzap.New(core, uberzap.AddCaller(), uberzap.AddCallerSkip(2)))
 
-	zapLogger, err := zapConf.Build(uberzap.AddCaller(), uberzap.AddCallerSkip(2))
-	if err != nil {
-		return nil, err
-	}
-
-	return zap.NewLogger(zapLogger), nil
+	return logger, nil
 }
 
 // getZapLevel 转换日志级别
@@ -185,4 +138,92 @@ func getZapLevel(level string) zapcore.Level {
 	default:
 		return zapcore.InfoLevel
 	}
+}
+
+func getFileZapCore(c *conf.Log) (zapcore.Core, error) {
+	// 1. 创建目录
+	if err := os.MkdirAll(c.GetPath(), 0o755); err != nil {
+		return nil, err
+	}
+
+	// 2. 解析级别文件映射（示例配置）
+	levelMap := map[string]string{
+		"info":  "app.log",   // info级别日志
+		"error": "err.log",   // error级别日志
+		"debug": "debug.log", // 新增debug级别日志
+	}
+
+	encoderConfig := uberzap.NewProductionEncoderConfig()
+	omitZapEncoderConfig(&encoderConfig)
+	encoder := zapcore.NewJSONEncoder(encoderConfig)
+
+	// 3. 动态创建核心
+	var cores []zapcore.Core
+
+	for levelStr, filename := range levelMap {
+		// 获取当前级别
+		level := getZapLevel(levelStr)
+
+		// 创建对应文件核心
+		core := newFileCore(
+			filepath.Join(c.GetPath(), filename),
+			encoder,
+			level, // 该文件的最小记录级别
+			c.MaxSize,
+			c.KeepDays,
+			c.MaxBackups,
+			c.Compress,
+		)
+		cores = append(cores, core)
+	}
+
+	return zapcore.NewTee(cores...), nil
+}
+
+// 通用文件核心创建
+func newFileCore(
+	filename string,
+	encoder zapcore.Encoder,
+	minLevel zapcore.Level,
+	maxSize, keepDays, maxBackups int32,
+	compress bool,
+) zapcore.Core {
+	lumberjackLogger := &lumberjack.Logger{
+		Filename:   filename,
+		MaxSize:    int(maxSize),    // 日志文件最大大小(MB)
+		MaxBackups: int(maxBackups), // 保留旧日志文件数量
+		MaxAge:     int(keepDays),   // 保留天数
+		Compress:   compress,        // 是否压缩旧日志
+	}
+
+	return zapcore.NewCore(
+		encoder,
+		zapcore.AddSync(lumberjackLogger),
+		uberzap.LevelEnablerFunc(func(lvl zapcore.Level) bool {
+			return lvl == minLevel
+		}),
+	)
+}
+
+func getConsoleZapCore(c *conf.Log) (zapcore.Core, error) {
+	encoderConfig := uberzap.NewDevelopmentEncoderConfig()
+	encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	omitZapEncoderConfig(&encoderConfig)
+	encoder := zapcore.NewConsoleEncoder(encoderConfig)
+
+	return zapcore.NewCore(
+		encoder,
+		zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout)),
+		uberzap.NewAtomicLevelAt(getZapLevel(c.GetLevel())),
+	), nil
+}
+
+func omitZapEncoderConfig(conf *zapcore.EncoderConfig) {
+	conf.TimeKey = zapcore.OmitKey
+	conf.LevelKey = zapcore.OmitKey
+	conf.NameKey = zapcore.OmitKey
+	conf.CallerKey = zapcore.OmitKey
+	conf.FunctionKey = zapcore.OmitKey
+	conf.MessageKey = zapcore.OmitKey
+	conf.StacktraceKey = zapcore.OmitKey
 }

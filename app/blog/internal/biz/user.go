@@ -2,21 +2,23 @@ package biz
 
 import (
 	"context"
-	"github.com/HiBugEnterprise/gotools/errorx"
-	"github.com/go-kratos/kratos/v2/log"
-	"github.com/pkg/errors"
-	"gorm.io/gorm"
+	"github.com/go-kratos/kratos/v2/errors"
+	"strconv"
+	"sunflower-blog-svc/pkg/errx"
+	"time"
+
 	"sunflower-blog-svc/app/blog/internal/conf"
 	"sunflower-blog-svc/app/blog/internal/pkg/jwtc"
 	"sunflower-blog-svc/pkg/codex"
 	"sunflower-blog-svc/pkg/helper/encrypt"
-	"time"
+
+	"github.com/HiBugEnterprise/gotools/errorx"
+	"github.com/go-kratos/kratos/v2/log"
+	"gorm.io/gorm"
 )
 
-var (
-	// WrongUserNameOrPassword is user not found.
-	WrongUserNameOrPassword = errorx.New("biz user", int(codex.CodeWrongUserNameOrPassword), codex.CodeWrongUserNameOrPassword.Msg()).Show()
-)
+// WrongUserNameOrPassword is user not found.
+var WrongUserNameOrPassword = errx.New(codex.CodeWrongUserNameOrPassword, "数据库找不到用户")
 
 type User struct {
 	Id          int64
@@ -51,10 +53,28 @@ func NewUserUseCase(repo UserRepo, logger log.Logger, jwtConf *conf.Jwt) *UserUs
 	return &UserUseCase{userRepo: repo, log: log.NewHelper(logger), jwtConf: jwtConf}
 }
 
+func (uu *UserUseCase) UserInfoById(ctx context.Context, id int64) (*User, error) {
+	metadata := map[string]string{
+		"uid": strconv.FormatInt(id, 10),
+	}
+
+	userInfo, err := uu.userRepo.FindByID(ctx, id)
+	if err != nil {
+		err = errx.Internal(err, "根据id查找用户信息失败").WithMetadata(metadata)
+		return nil, err
+	}
+
+	if userInfo == nil {
+		return nil, errx.New(codex.CodeUserNotExist, "用户不存在").WithMetadata(metadata)
+	}
+
+	return userInfo, nil
+}
+
 func (uu *UserUseCase) UserInfoByAccount(ctx context.Context, account string) (*User, error) {
 	userInfo, err := uu.userRepo.FindByAccount(ctx, account)
 	if err != nil {
-		return nil, errors.Wrap(err, "根据账号查找用户信息失败")
+		return nil, errx.Internal(err, "根据账号查找用户信息失败")
 	}
 
 	return userInfo, nil
@@ -67,7 +87,7 @@ func (uu *UserUseCase) Login(ctx context.Context, account, password string) (tok
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, WrongUserNameOrPassword
 		}
-		return nil, errorx.Internal(err, "根据账号查找用户信息失败").WithMetadata(errorx.Metadata{
+		return nil, errors.New(int(codex.CodeInternalErr), "根据账号查找用户信息失败", codex.CodeInternalErr.Msg()).WithCause(err).WithMetadata(map[string]string{
 			"account": account,
 		})
 	}
@@ -100,7 +120,6 @@ func (uu *UserUseCase) Login(ctx context.Context, account, password string) (tok
 }
 
 func (uu *UserUseCase) Register(ctx context.Context, account, password string) error {
-
 	hashPwd := encrypt.PasswordHash(password)
 	user := &User{
 		Account:     account,
