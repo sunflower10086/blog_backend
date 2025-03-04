@@ -2,7 +2,9 @@ package biz
 
 import (
 	"context"
-	"github.com/HiBugEnterprise/gotools/errorx"
+	"fmt"
+
+	"sunflower-blog-svc/pkg/errx"
 
 	"github.com/go-kratos/kratos/v2/log"
 )
@@ -17,6 +19,10 @@ type Post struct {
 	Id      int64
 	Title   string
 	Content string
+}
+
+func (p *Post) String() string {
+	return fmt.Sprintf("id: %d, title: %s, content: %s", p.Id, p.Title, p.Content)
 }
 
 // PosterRepo is a Greater userRepo.
@@ -44,7 +50,7 @@ func NewPosterUseCase(repo PosterRepo, logger log.Logger) *PosterUseCase {
 func (uc *PosterUseCase) Posts(ctx context.Context, pageNum, pageSize int, tags []string, categories string) ([]*Post, int64, error) {
 	posts, count, err := uc.repo.List(ctx, pageNum, pageSize, tags, categories)
 	if err != nil {
-		return nil, 0, errorx.Internal(err, "查询文章列表失败")
+		return nil, 0, errx.Internal(err, "查询文章列表失败")
 	}
 
 	return posts, count, nil
@@ -53,8 +59,8 @@ func (uc *PosterUseCase) Posts(ctx context.Context, pageNum, pageSize int, tags 
 func (uc *PosterUseCase) CreatePost(ctx context.Context, post *Post) (*Post, error) {
 	post, err := uc.repo.Create(ctx, post)
 	if err != nil {
-		err = errorx.Internal(err, "创建帖子失败").WithMetadata(errorx.Metadata{
-			"post": *post,
+		err = errx.Internal(err, "创建帖子失败").WithMetadata(map[string]string{
+			"post": post.String(),
 		})
 		return nil, err
 	}

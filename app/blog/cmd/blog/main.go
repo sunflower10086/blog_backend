@@ -219,11 +219,11 @@ func getConsoleZapCore(c *conf.Log) (zapcore.Core, error) {
 }
 
 func omitZapEncoderConfig(conf *zapcore.EncoderConfig) {
-	conf.TimeKey = zapcore.OmitKey
-	conf.LevelKey = zapcore.OmitKey
-	conf.NameKey = zapcore.OmitKey
+	// conf.TimeKey = zapcore.OmitKey
+	// conf.LevelKey = zapcore.OmitKey
+	// conf.NameKey = zapcore.OmitKey
 	conf.CallerKey = zapcore.OmitKey
 	conf.FunctionKey = zapcore.OmitKey
-	conf.MessageKey = zapcore.OmitKey
+	// conf.MessageKey = zapcore.OmitKey
 	conf.StacktraceKey = zapcore.OmitKey
 }

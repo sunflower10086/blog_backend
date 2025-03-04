@@ -5,8 +5,9 @@ import (
 
 	v1 "sunflower-blog-svc/api/blog/v1"
 	"sunflower-blog-svc/app/blog/internal/pkg/ctxdata"
+	"sunflower-blog-svc/pkg/codex"
+	"sunflower-blog-svc/pkg/errx"
 
-	"github.com/HiBugEnterprise/gotools/errorx"
 	"github.com/go-kratos/kratos/v2/middleware"
 	"github.com/go-kratos/kratos/v2/middleware/auth/jwt"
 	"github.com/go-kratos/kratos/v2/middleware/selector"
@@ -14,12 +15,13 @@ import (
 )
 
 var noNeedLogin = map[string]struct{}{
-	v1.OperationUserLogin:       {},
-	v1.OperationPosterListPosts: {},
-	v1.OperationPosterGetPost:   {},
+	v1.OperationUserLogin:        {},
+	v1.OperationPosterListPosts:  {},
+	v1.OperationPosterGetPost:    {},
+	v1.OperationUserRootUserInfo: {},
 }
 
-var ErrUnauthorized = errorx.Unauthorized("UNAUTHORIZED_INFO_MISSING", "授权已过期或授权异常,请重新授权").Show()
+var ErrUnauthorized = errx.New(codex.CodeNeedLogin, "授权已过期或授权异常,请重新授权")
 
 func NewWhiteListMatcher() selector.MatchFunc {
 	return func(ctx context.Context, operation string) bool {

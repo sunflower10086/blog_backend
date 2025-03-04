@@ -2,17 +2,18 @@ package biz
 
 import (
 	"context"
-	"github.com/go-kratos/kratos/v2/errors"
 	"strconv"
-	"sunflower-blog-svc/pkg/errx"
 	"time"
+
+	"sunflower-blog-svc/pkg/errx"
+
+	"github.com/go-kratos/kratos/v2/errors"
 
 	"sunflower-blog-svc/app/blog/internal/conf"
 	"sunflower-blog-svc/app/blog/internal/pkg/jwtc"
 	"sunflower-blog-svc/pkg/codex"
 	"sunflower-blog-svc/pkg/helper/encrypt"
 
-	"github.com/HiBugEnterprise/gotools/errorx"
 	"github.com/go-kratos/kratos/v2/log"
 	"gorm.io/gorm"
 )
@@ -87,7 +88,7 @@ func (uu *UserUseCase) Login(ctx context.Context, account, password string) (tok
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, WrongUserNameOrPassword
 		}
-		return nil, errors.New(int(codex.CodeInternalErr), "根据账号查找用户信息失败", codex.CodeInternalErr.Msg()).WithCause(err).WithMetadata(map[string]string{
+		return nil, errx.Internal(err, "查询数据库失败").WithMetadata(map[string]string{
 			"account": account,
 		})
 	}
@@ -107,7 +108,7 @@ func (uu *UserUseCase) Login(ctx context.Context, account, password string) (tok
 	}
 	jwtToken, err := jwtc.GenJwtToken(uu.jwtConf.AccessSecret, &payload)
 	if err != nil {
-		return nil, errorx.Internal(err, "生成token失败").WithMetadata(errorx.Metadata{
+		return nil, errx.Internal(err, "生成token失败").WithMetadata(map[string]string{
 			"account_secret": uu.jwtConf.AccessSecret,
 		})
 	}
@@ -129,7 +130,7 @@ func (uu *UserUseCase) Register(ctx context.Context, account, password string) e
 
 	_, err := uu.userRepo.Save(ctx, user)
 	if err != nil {
-		return errorx.Internal(err, "注册用户失败")
+		return errx.Internal(err, "注册用户失败")
 	}
 
 	return nil

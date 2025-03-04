@@ -64,3 +64,19 @@ func (s *UserService) UserInfo(ctx context.Context, req *emptypb.Empty) (*pb.Use
 	}
 	return userInfoReply, nil
 }
+
+func (s *UserService) RootUserInfo(ctx context.Context, req *emptypb.Empty) (*pb.UserInfoReply, error) {
+	rootUid := int64(1)
+
+	userInfo, err := s.userUc.UserInfoById(ctx, rootUid)
+	if err != nil {
+		return nil, err
+	}
+
+	userInfoReply := &pb.UserInfoReply{
+		Username: userInfo.UserName,
+		Email:    userInfo.Account,
+		Avatar:   "",
+	}
+	return userInfoReply, nil
+}

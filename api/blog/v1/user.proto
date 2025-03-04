@@ -29,6 +29,12 @@ service User {
       get: "/api/v1/user"
     };
   }
+
+  rpc RootUserInfo (google.protobuf.Empty) returns (UserInfoReply) {
+    option (google.api.http) = {
+      get: "/api/v1/user/root"
+    };
+  }
 }
 
 message LoginRequest {
