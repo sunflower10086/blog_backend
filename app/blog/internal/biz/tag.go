@@ -20,7 +20,6 @@ type TagUseCase struct {
 	log     *log.Helper
 }
 
-// NewUserUseCase new a User useCase.
 func NewTagUseCase(repo TagRepo, logger log.Logger) *TagUseCase {
 	return &TagUseCase{TagRepo: repo, log: log.NewHelper(logger)}
 }
