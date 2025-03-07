@@ -28,10 +28,10 @@ func NewHTTPServer(
 	confJwt := bc.Jwt
 	opts := []http.ServerOption{
 		http.Middleware(
-			recovery.Recovery(),
-			validate.Validator(),
-			selector.Server(recovery.Recovery(), tracing.Server()).Prefix("/api").Build(),
 			logging.Server(logger),
+			recovery.Recovery(),
+			validate.Validator(logger),
+			selector.Server(recovery.Recovery(), tracing.Server()).Prefix("/api").Build(),
 			middlewares.Jwt(confJwt.GetAccessSecret()),
 		),
 		http.Filter(handlers.CORS(

@@ -440,7 +440,7 @@ func (m *PostBaseInfo) validate(all bool) error {
 
 	// no validation rules for UpdatedAt
 
-	// no validation rules for Categories
+	// no validation rules for CategoryId
 
 	if len(errors) > 0 {
 		return PostBaseInfoMultiError(errors)
@@ -676,7 +676,7 @@ func (m *CreatePostRequest) validate(all bool) error {
 
 	// no validation rules for Description
 
-	// no validation rules for Categories
+	// no validation rules for CategoryId
 
 	// no validation rules for Content
 
@@ -924,10 +924,10 @@ func (m *DeletePostRequest) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetPostId()) < 1 {
+	if m.GetPostId() <= 0 {
 		err := DeletePostRequestValidationError{
 			field:  "PostId",
-			reason: "value length must be at least 1 runes",
+			reason: "value must be greater than 0",
 		}
 		if !all {
 			return err

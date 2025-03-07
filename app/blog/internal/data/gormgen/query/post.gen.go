@@ -35,6 +35,8 @@ func newPost(db *gorm.DB, opts ...gen.DOOption) post {
 	_post.Content = field.NewString(tableName, "content")
 	_post.AuthorID = field.NewInt64(tableName, "author_id")
 	_post.Cover = field.NewString(tableName, "cover")
+	_post.CategoryId = field.NewInt64(tableName, "category_id")
+	_post.Tags = field.NewField(tableName, "tags")
 
 	_post.fillFieldMap()
 
@@ -44,15 +46,17 @@ func newPost(db *gorm.DB, opts ...gen.DOOption) post {
 type post struct {
 	postDo
 
-	ALL       field.Asterisk
-	ID        field.Int64
-	CreatedAt field.Time
-	UpdatedAt field.Time
-	DeletedAt field.Field
-	Title     field.String
-	Content   field.String
-	AuthorID  field.Int64
-	Cover     field.String
+	ALL        field.Asterisk
+	ID         field.Int64
+	CreatedAt  field.Time
+	UpdatedAt  field.Time
+	DeletedAt  field.Field
+	Title      field.String
+	Content    field.String
+	AuthorID   field.Int64
+	Cover      field.String
+	CategoryId field.Int64
+	Tags       field.Field
 
 	fieldMap map[string]field.Expr
 }
@@ -77,6 +81,8 @@ func (p *post) updateTableName(table string) *post {
 	p.Content = field.NewString(table, "content")
 	p.AuthorID = field.NewInt64(table, "author_id")
 	p.Cover = field.NewString(table, "cover")
+	p.CategoryId = field.NewInt64(table, "category_id")
+	p.Tags = field.NewField(table, "tags")
 
 	p.fillFieldMap()
 
@@ -93,7 +99,7 @@ func (p *post) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (p *post) fillFieldMap() {
-	p.fieldMap = make(map[string]field.Expr, 8)
+	p.fieldMap = make(map[string]field.Expr, 10)
 	p.fieldMap["id"] = p.ID
 	p.fieldMap["created_at"] = p.CreatedAt
 	p.fieldMap["updated_at"] = p.UpdatedAt
@@ -102,6 +108,8 @@ func (p *post) fillFieldMap() {
 	p.fieldMap["content"] = p.Content
 	p.fieldMap["author_id"] = p.AuthorID
 	p.fieldMap["cover"] = p.Cover
+	p.fieldMap["category_id"] = p.CategoryId
+	p.fieldMap["tags"] = p.Tags
 }
 
 func (p post) clone(db *gorm.DB) post {

@@ -24,7 +24,7 @@ log:
   #   console：将日志输出到控制台。
   #   file：将日志输出到文件。
   #   volume：在 Kubernetes 环境中使用，将主机名添加到日志文件名中
-  Mode: file
+  Mode: console
   # 输出格式 json, plain, 默认 json
   #   json：使用 JSON 编码。
   #   plain：使用纯文本编码，通常在开发过程中使用。

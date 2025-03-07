@@ -2,10 +2,14 @@ package data
 
 import (
 	"context"
-	"github.com/go-kratos/kratos/v2/log"
-	"github.com/pkg/errors"
+	"encoding/json"
+	"fmt"
+
 	"sunflower-blog-svc/app/blog/internal/biz"
 	"sunflower-blog-svc/app/blog/internal/data/gormgen/model"
+
+	"github.com/go-kratos/kratos/v2/log"
+	"github.com/pkg/errors"
 )
 
 var _ biz.PosterRepo = (*posterRepo)(nil)
@@ -35,7 +39,10 @@ func (r *posterRepo) Create(ctx context.Context, post *biz.Post) (*biz.Post, err
 		return nil, errors.Wrap(err, "创建 post 失败")
 	}
 
-	respPost := postEnt.ConverterBizPost()
+	respPost, err := postEnt.ConverterBizPost()
+	if err != nil {
+		return nil, errors.Wrap(err, "转换 post 失败")
+	}
 
 	return respPost, nil
 }
@@ -43,14 +50,22 @@ func (r *posterRepo) Create(ctx context.Context, post *biz.Post) (*biz.Post, err
 func (r *posterRepo) Save(ctx context.Context, g *biz.Post) (*biz.Post, error) {
 	q := r.data.DB.Post.WithContext(ctx)
 
+	entTags := make([]int64, 0, len(g.Tags))
+	for _, tag := range g.Tags {
+		entTags = append(entTags, int64(tag))
+	}
+	entTagsBytes, _ := json.Marshal(entTags)
+
 	postEnt := &model.Post{
-		ID:      g.Id,
-		Title:   g.Title,
-		Content: g.Content,
+		ID:         g.Id,
+		Title:      g.Title,
+		Content:    g.Content,
+		Cover:      g.Cover,
+		CategoryId: g.CategoryId,
+		Tags:       entTagsBytes,
 	}
 	if err := q.Save(postEnt); err != nil {
 		return nil, errors.Wrap(err, "save post data field")
-
 	}
 	return g, nil
 }
@@ -65,7 +80,6 @@ func (r *posterRepo) Update(ctx context.Context, g *biz.Post) (*biz.Post, error)
 	}
 	if err := q.Save(postEnt); err != nil {
 		return nil, errors.Wrap(err, "save post data field")
-
 	}
 	return g, nil
 }
@@ -83,23 +97,39 @@ func (r *posterRepo) ListAll(context.Context) ([]*biz.Post, error) {
 }
 
 func (r *posterRepo) List(ctx context.Context, pageNum int, pageSize int, tags []string, categories string) ([]*biz.Post, int64, error) {
-	q := r.data.DB.Post.WithContext(ctx)
-	q = q.Scopes(Paginate(int64(pageNum), int64(pageSize)))
+	q := r.data.DB.Post
+	query1 := q.WithContext(ctx).Scopes(Paginate(int64(pageNum), int64(pageSize))).Order(q.ID.Desc())
 
-	total, err := q.Count()
+	total, err := query1.Count()
 	if err != nil {
 		return nil, 0, errors.Wrap(err, "查询帖子总数出错")
 	}
 
-	postList, err := q.Find()
+	postList, err := query1.Find()
 	if err != nil {
 		return nil, 0, errors.Wrap(err, "查询帖子出错")
 	}
 
 	resp := make([]*biz.Post, 0, len(postList))
 	for _, post := range postList {
-		resp = append(resp, post.ConverterBizPost())
+		bizPost, err := post.ConverterBizPost()
+		if err != nil {
+			return nil, 0, errors.Wrap(err, "转换post出错")
+		}
+		resp = append(resp, bizPost)
 	}
 
+	fmt.Println(resp)
+
 	return resp, total, nil
+}
+
+func (r *posterRepo) Delete(ctx context.Context, id int64) error {
+	postQuery := r.data.DB.Post
+	_, err := postQuery.WithContext(ctx).Delete(&model.Post{ID: id})
+	if err != nil {
+		return errors.Wrap(err, "删除帖子出错")
+	}
+
+	return nil
 }

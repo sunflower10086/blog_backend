@@ -66,11 +66,11 @@ message PostBaseInfo {
   int32 id = 1;
   string title = 2;
   string cover = 3;
-  repeated string tags = 4;
+  repeated int32 tags = 4;
   string description = 5;
   int32 created_at = 6;
   int32 updated_at = 7;
-  string categories = 8;
+  int32 category_id = 8;
 }
 
 // 博客实体
@@ -82,9 +82,9 @@ message Post {
 message CreatePostRequest {
   string title = 1;
   string cover = 2;
-  repeated string tags = 3;
+  repeated int32 tags = 3;
   string description = 4;
-  string categories = 5;
+  int32 category_id = 5;
   string content = 6;
 }
 
@@ -93,5 +93,5 @@ message UpdatePostRequest {
 }
 
 message DeletePostRequest {
-  string post_id = 1 [(validate.rules).string.min_len = 1];
+  int32 post_id = 1 [(validate.rules).int32.gt = 0];
 }
