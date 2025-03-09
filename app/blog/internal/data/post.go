@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-
+	"gorm.io/gorm"
 	"sunflower-blog-svc/app/blog/internal/biz"
 	"sunflower-blog-svc/app/blog/internal/data/gormgen/model"
 
@@ -84,16 +84,19 @@ func (r *posterRepo) Update(ctx context.Context, g *biz.Post) (*biz.Post, error)
 	return g, nil
 }
 
-func (r *posterRepo) FindByID(context.Context, int64) (*biz.Post, error) {
-	return nil, nil
-}
+func (r *posterRepo) FindByID(ctx context.Context, postId int64) (*biz.Post, error) {
+	q := r.data.DB.Post
+	post, err := q.WithContext(ctx).Where(q.ID.Eq(postId)).First()
 
-func (r *posterRepo) ListByHello(context.Context, string) ([]*biz.Post, error) {
-	return nil, nil
-}
-
-func (r *posterRepo) ListAll(context.Context) ([]*biz.Post, error) {
-	return nil, nil
+	switch {
+	case err == nil:
+		return post.ConverterBizPost()
+	case errors.Is(err, gorm.ErrRecordNotFound):
+		r.log.WithContext(ctx).Errorf("post is not found, post_id:{%d}", postId)
+		return nil, err
+	default:
+		return nil, errors.Wrap(err, "查询帖子出错")
+	}
 }
 
 func (r *posterRepo) List(ctx context.Context, pageNum int, pageSize int, tags []string, categories string) ([]*biz.Post, int64, error) {

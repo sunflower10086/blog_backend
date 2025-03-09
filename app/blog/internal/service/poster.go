@@ -16,19 +16,23 @@ import (
 type PosterService struct {
 	pb.UnimplementedPosterServer
 
-	uc     *biz.PosterUseCase
-	logger *log.Helper
+	postUc     *biz.PosterUseCase
+	tagUc      *biz.TagUseCase
+	categoryUc *biz.CategoryUseCase
+	logger     *log.Helper
 }
 
-func NewPosterService(uc *biz.PosterUseCase, logger log.Logger) *PosterService {
+func NewPosterService(uc *biz.PosterUseCase, tagUc *biz.TagUseCase, categoryUc *biz.CategoryUseCase, logger log.Logger) *PosterService {
 	return &PosterService{
-		uc:     uc,
-		logger: log.NewHelper(log.With(logger, "service", "Post")),
+		postUc:     uc,
+		tagUc:      tagUc,
+		categoryUc: categoryUc,
+		logger:     log.NewHelper(log.With(logger, "service", "Post")),
 	}
 }
 
 func (s *PosterService) ListPosts(ctx context.Context, req *pb.ListPostsRequest) (*pb.ListPostsResponse, error) {
-	posts, total, err := s.uc.Posts(ctx, int(req.Page), int(req.PageSize), []string{}, "")
+	posts, total, err := s.postUc.Posts(ctx, int(req.Page), int(req.PageSize), []string{}, "")
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +78,7 @@ func (s *PosterService) CreatePost(ctx context.Context, req *pb.CreatePostReques
 		Tags:       req.Tags,
 		CategoryId: int64(req.CategoryId),
 	}
-	post, err := s.uc.CreatePost(ctx, bizPost)
+	post, err := s.postUc.CreatePost(ctx, bizPost)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +107,7 @@ func (s *PosterService) UpdatePost(ctx context.Context, req *pb.UpdatePostReques
 		CategoryId: int64(req.Post.BaseInfo.CategoryId),
 	}
 
-	err := s.uc.SavePost(ctx, bizPost)
+	err := s.postUc.SavePost(ctx, bizPost)
 	if err != nil {
 		return nil, err
 	}
@@ -111,6 +115,37 @@ func (s *PosterService) UpdatePost(ctx context.Context, req *pb.UpdatePostReques
 }
 
 func (s *PosterService) DeletePost(ctx context.Context, req *pb.DeletePostRequest) (*emptypb.Empty, error) {
-	err := s.uc.DelPost(ctx, int64(req.PostId))
+	err := s.postUc.DelPost(ctx, int64(req.PostId))
 	return nil, err
+}
+
+func (s *PosterService) ListTags(ctx context.Context, req *emptypb.Empty) (*pb.ListTagsResp, error) {
+	tagList, err := s.tagUc.ListTag(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &pb.ListTagsResp{}
+	for _, tag := range tagList {
+		resp.Tags = append(resp.Tags, &pb.ListTagsResp_Tag{
+			Id:   int32(tag.Id),
+			Name: tag.Name,
+		})
+	}
+	return resp, nil
+}
+func (s *PosterService) ListCategory(ctx context.Context, req *emptypb.Empty) (*pb.ListCategoryResp, error) {
+	categoryList, err := s.categoryUc.ListCategory(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &pb.ListCategoryResp{}
+	for _, category := range categoryList {
+		resp.Categories = append(resp.Categories, &pb.ListCategoryResp_Category{
+			Id:   int32(category.Id),
+			Name: category.Name,
+		})
+	}
+	return resp, nil
 }

@@ -5,6 +5,302 @@ openapi: 3.0.3
 info:
     title: ""
     version: 0.0.1
-paths: {}
+paths:
+    /api/v1/categories:
+        get:
+            tags:
+                - Poster
+            operationId: Poster_ListCategory
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/blog.v1.ListCategoryResp'
+    /api/v1/post:
+        put:
+            tags:
+                - Poster
+            operationId: Poster_UpdatePost
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/blog.v1.UpdatePostRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/blog.v1.Post'
+        post:
+            tags:
+                - Poster
+            operationId: Poster_CreatePost
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/blog.v1.CreatePostRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/blog.v1.Post'
+    /api/v1/post/{postId}:
+        get:
+            tags:
+                - Poster
+            description: 获取单个博客详情
+            operationId: Poster_GetPost
+            parameters:
+                - name: postId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/blog.v1.Post'
+        delete:
+            tags:
+                - Poster
+            operationId: Poster_DeletePost
+            parameters:
+                - name: postId
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /api/v1/posts:
+        get:
+            tags:
+                - Poster
+            description: 获取博客列表
+            operationId: Poster_ListPosts
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/blog.v1.ListPostsResponse'
+    /api/v1/tags:
+        get:
+            tags:
+                - Poster
+            operationId: Poster_ListTags
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/blog.v1.ListTagsResp'
+    /api/v1/user:
+        get:
+            tags:
+                - User
+            operationId: User_UserInfo
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.v1.UserInfoReply'
+    /api/v1/user/login:
+        post:
+            tags:
+                - User
+            operationId: User_Login
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.admin.v1.LoginRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.v1.LoginReply'
+    /api/v1/user/logout:
+        post:
+            tags:
+                - User
+            operationId: User_Logout
+            requestBody:
+                content:
+                    application/json: {}
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /api/v1/user/root:
+        get:
+            tags:
+                - User
+            operationId: User_RootUserInfo
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.v1.UserInfoReply'
 components:
-    schemas: {}
+    schemas:
+        api.admin.v1.LoginReply:
+            type: object
+            properties:
+                token:
+                    type: string
+        api.admin.v1.LoginRequest:
+            type: object
+            properties:
+                account:
+                    type: string
+                password:
+                    type: string
+        api.admin.v1.UserInfoReply:
+            type: object
+            properties:
+                username:
+                    type: string
+                email:
+                    type: string
+                avatar:
+                    type: string
+        blog.v1.CreatePostRequest:
+            type: object
+            properties:
+                title:
+                    type: string
+                cover:
+                    type: string
+                tags:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+                description:
+                    type: string
+                categoryId:
+                    type: integer
+                    format: int32
+                content:
+                    type: string
+        blog.v1.ListCategoryResp:
+            type: object
+            properties:
+                categories:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/blog.v1.ListCategoryResp_Category'
+        blog.v1.ListCategoryResp_Category:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                name:
+                    type: string
+        blog.v1.ListPostsResponse:
+            type: object
+            properties:
+                posts:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/blog.v1.PostBaseInfo'
+                total:
+                    type: integer
+                    format: int32
+            description: 获取博客列表的响应
+        blog.v1.ListTagsResp:
+            type: object
+            properties:
+                tags:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/blog.v1.ListTagsResp_Tag'
+        blog.v1.ListTagsResp_Tag:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                name:
+                    type: string
+        blog.v1.Post:
+            type: object
+            properties:
+                baseInfo:
+                    $ref: '#/components/schemas/blog.v1.PostBaseInfo'
+                content:
+                    type: string
+            description: 博客实体
+        blog.v1.PostBaseInfo:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                title:
+                    type: string
+                cover:
+                    type: string
+                tags:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+                description:
+                    type: string
+                createdAt:
+                    type: integer
+                    format: int32
+                updatedAt:
+                    type: integer
+                    format: int32
+                categoryId:
+                    type: integer
+                    format: int32
+        blog.v1.UpdatePostRequest:
+            type: object
+            properties:
+                post:
+                    $ref: '#/components/schemas/blog.v1.Post'
+tags:
+    - name: Poster
+      description: 博客服务定义
+    - name: User

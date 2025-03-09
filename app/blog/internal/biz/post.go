@@ -35,8 +35,6 @@ type PosterRepo interface {
 	Save(context.Context, *Post) (*Post, error)
 	Update(context.Context, *Post) (*Post, error)
 	FindByID(context.Context, int64) (*Post, error)
-	ListByHello(context.Context, string) ([]*Post, error)
-	ListAll(context.Context) ([]*Post, error)
 	List(ctx context.Context, pageNum int, pageSize int, tags []string, categories string) ([]*Post, int64, error)
 	Create(ctx context.Context, post *Post) (*Post, error)
 	Delete(ctx context.Context, id int64) error

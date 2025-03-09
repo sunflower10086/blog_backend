@@ -35,6 +35,273 @@ var (
 	_ = sort.Sort
 )
 
+// Validate checks the field values on ListCategoryResp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *ListCategoryResp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListCategoryResp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListCategoryRespMultiError, or nil if none found.
+func (m *ListCategoryResp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListCategoryResp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetCategories() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ListCategoryRespValidationError{
+						field:  fmt.Sprintf("Categories[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ListCategoryRespValidationError{
+						field:  fmt.Sprintf("Categories[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ListCategoryRespValidationError{
+					field:  fmt.Sprintf("Categories[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return ListCategoryRespMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListCategoryRespMultiError is an error wrapping multiple validation errors
+// returned by ListCategoryResp.ValidateAll() if the designated constraints
+// aren't met.
+type ListCategoryRespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListCategoryRespMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListCategoryRespMultiError) AllErrors() []error { return m }
+
+// ListCategoryRespValidationError is the validation error returned by
+// ListCategoryResp.Validate if the designated constraints aren't met.
+type ListCategoryRespValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListCategoryRespValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListCategoryRespValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListCategoryRespValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListCategoryRespValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListCategoryRespValidationError) ErrorName() string { return "ListCategoryRespValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ListCategoryRespValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListCategoryResp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListCategoryRespValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListCategoryRespValidationError{}
+
+// Validate checks the field values on ListTagsResp with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *ListTagsResp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListTagsResp with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ListTagsRespMultiError, or
+// nil if none found.
+func (m *ListTagsResp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListTagsResp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetTags() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ListTagsRespValidationError{
+						field:  fmt.Sprintf("Tags[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ListTagsRespValidationError{
+						field:  fmt.Sprintf("Tags[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ListTagsRespValidationError{
+					field:  fmt.Sprintf("Tags[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return ListTagsRespMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListTagsRespMultiError is an error wrapping multiple validation errors
+// returned by ListTagsResp.ValidateAll() if the designated constraints aren't met.
+type ListTagsRespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListTagsRespMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListTagsRespMultiError) AllErrors() []error { return m }
+
+// ListTagsRespValidationError is the validation error returned by
+// ListTagsResp.Validate if the designated constraints aren't met.
+type ListTagsRespValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListTagsRespValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListTagsRespValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListTagsRespValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListTagsRespValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListTagsRespValidationError) ErrorName() string { return "ListTagsRespValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ListTagsRespValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListTagsResp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListTagsRespValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListTagsRespValidationError{}
+
 // Validate checks the field values on ListPostsRequest with the rules defined
 // in the proto definition for this message. If any rules are violated, the
 // first error encountered is returned, or nil if there are no violations.
@@ -93,7 +360,7 @@ type ListPostsRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ListPostsRequestMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -229,7 +496,7 @@ type ListPostsResponseMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m ListPostsResponseMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -342,7 +609,7 @@ type GetPostRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m GetPostRequestMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -455,7 +722,7 @@ type PostBaseInfoMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m PostBaseInfoMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -584,7 +851,7 @@ type PostMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m PostMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -694,7 +961,7 @@ type CreatePostRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m CreatePostRequestMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -836,7 +1103,7 @@ type UpdatePostRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m UpdatePostRequestMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -949,7 +1216,7 @@ type DeletePostRequestMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
 func (m DeletePostRequestMultiError) Error() string {
-	var msgs []string
+	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
 	}
@@ -1014,3 +1281,213 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DeletePostRequestValidationError{}
+
+// Validate checks the field values on ListCategoryResp_Category with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ListCategoryResp_Category) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListCategoryResp_Category with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListCategoryResp_CategoryMultiError, or nil if none found.
+func (m *ListCategoryResp_Category) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListCategoryResp_Category) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	// no validation rules for Name
+
+	if len(errors) > 0 {
+		return ListCategoryResp_CategoryMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListCategoryResp_CategoryMultiError is an error wrapping multiple validation
+// errors returned by ListCategoryResp_Category.ValidateAll() if the
+// designated constraints aren't met.
+type ListCategoryResp_CategoryMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListCategoryResp_CategoryMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListCategoryResp_CategoryMultiError) AllErrors() []error { return m }
+
+// ListCategoryResp_CategoryValidationError is the validation error returned by
+// ListCategoryResp_Category.Validate if the designated constraints aren't met.
+type ListCategoryResp_CategoryValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListCategoryResp_CategoryValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListCategoryResp_CategoryValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListCategoryResp_CategoryValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListCategoryResp_CategoryValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListCategoryResp_CategoryValidationError) ErrorName() string {
+	return "ListCategoryResp_CategoryValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListCategoryResp_CategoryValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListCategoryResp_Category.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListCategoryResp_CategoryValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListCategoryResp_CategoryValidationError{}
+
+// Validate checks the field values on ListTagsResp_Tag with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *ListTagsResp_Tag) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListTagsResp_Tag with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListTagsResp_TagMultiError, or nil if none found.
+func (m *ListTagsResp_Tag) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListTagsResp_Tag) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Id
+
+	// no validation rules for Name
+
+	if len(errors) > 0 {
+		return ListTagsResp_TagMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListTagsResp_TagMultiError is an error wrapping multiple validation errors
+// returned by ListTagsResp_Tag.ValidateAll() if the designated constraints
+// aren't met.
+type ListTagsResp_TagMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListTagsResp_TagMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListTagsResp_TagMultiError) AllErrors() []error { return m }
+
+// ListTagsResp_TagValidationError is the validation error returned by
+// ListTagsResp_Tag.Validate if the designated constraints aren't met.
+type ListTagsResp_TagValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListTagsResp_TagValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListTagsResp_TagValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListTagsResp_TagValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListTagsResp_TagValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListTagsResp_TagValidationError) ErrorName() string { return "ListTagsResp_TagValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ListTagsResp_TagValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListTagsResp_Tag.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListTagsResp_TagValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListTagsResp_TagValidationError{}

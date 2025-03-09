@@ -43,6 +43,34 @@ service Poster {
       get: "/api/v1/post/{post_id}"
     };
   }
+
+  rpc ListTags (google.protobuf.Empty) returns (ListTagsResp) {
+    option (google.api.http) = {
+      get: "/api/v1/tags"
+    };
+  }
+
+  rpc ListCategory (google.protobuf.Empty) returns (ListCategoryResp) {
+    option (google.api.http) = {
+      get: "/api/v1/categories"
+    };
+  }
+}
+
+message ListCategoryResp {
+  message Category {
+    int32 id = 1;
+    string name = 2;
+  }
+  repeated Category categories = 1;
+}
+
+message ListTagsResp {
+  message Tag {
+    int32 id = 1;
+    string name = 2;
+  }
+  repeated Tag tags = 1;
 }
 
 // 获取博客列表的请求

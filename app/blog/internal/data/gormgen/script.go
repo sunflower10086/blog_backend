@@ -1,12 +1,12 @@
 package main
 
 import (
-	"sunflower-blog-svc/app/blog/internal/data/gormgen/model"
-
 	"github.com/go-kratos/kratos/v2/log"
 	"gorm.io/driver/postgres"
 	"gorm.io/gen"
 	"gorm.io/gorm"
+	"sunflower-blog-svc/app/blog/internal/data/gormgen/model"
+	"sunflower-blog-svc/pkg/helper/encrypt"
 )
 
 var (
@@ -45,4 +45,28 @@ func main() {
 	g.ApplyBasic(model.Post{}, model.User{}, model.Tag{}, model.Category{})
 	// g.ApplyInterface(func(CommonDao) {}, g.GenerateModel("la_user"))
 	g.Execute()
+
+	count := int64(0)
+	err := db.Model(&model.User{}).Count(&count).Error
+	if err != nil {
+		log.Fatal("count user failed: ", err)
+	}
+
+	if count != 0 {
+		return
+	}
+
+	hashPwd := encrypt.PasswordHash("123456")
+	// 创建一个用户
+	user := &model.User{
+		Username:    "root",
+		Account:     "root",
+		Password:    hashPwd,
+		Description: "这个用户很懒，什么都没有留下",
+	}
+
+	err = db.Model(&model.User{}).Create(user).Error
+	if err != nil {
+		log.Fatal("create user failed: ", err)
+	}
 }
