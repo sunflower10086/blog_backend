@@ -3,17 +3,17 @@ server:
   Mode: dev
   http:
     addr: 0.0.0.0:8000
-    timeout: 1s
+    timeout: 10s
   grpc:
     addr: 0.0.0.0:9000
-    timeout: 1s
+    timeout: 10s
 data:
   database:
     dsn: host=127.0.0.1 user=sunflower password=lz18738377974 dbname=blog port=5432 sslmode=disable TimeZone=Asia/Shanghai
-    LogMode: true
-    MaxOpenCons: 10
-    MaxIdleCons: 10
-    CreateBatchSize: 100
+    log_mode: true
+    max_open_cons: 10
+    max_idle_cons: 10
+    create_batch_size: 100
   redis:
     addr: 127.0.0.1:6379
     read_timeout: 0.2s

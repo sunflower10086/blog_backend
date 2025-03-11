@@ -4,9 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"gorm.io/gorm"
+
 	"sunflower-blog-svc/app/blog/internal/biz"
 	"sunflower-blog-svc/app/blog/internal/data/gormgen/model"
+
+	"gorm.io/datatypes"
+	"gorm.io/gorm"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/pkg/errors"
@@ -47,7 +50,7 @@ func (r *posterRepo) Create(ctx context.Context, post *biz.Post) (*biz.Post, err
 	return respPost, nil
 }
 
-func (r *posterRepo) Save(ctx context.Context, g *biz.Post) (*biz.Post, error) {
+func (r *posterRepo) Update(ctx context.Context, g *biz.Post) (*biz.Post, error) {
 	q := r.data.DB.Post.WithContext(ctx)
 
 	entTags := make([]int64, 0, len(g.Tags))
@@ -62,23 +65,9 @@ func (r *posterRepo) Save(ctx context.Context, g *biz.Post) (*biz.Post, error) {
 		Content:    g.Content,
 		Cover:      g.Cover,
 		CategoryId: g.CategoryId,
-		Tags:       entTagsBytes,
+		Tags:       datatypes.JSON(entTagsBytes),
 	}
-	if err := q.Save(postEnt); err != nil {
-		return nil, errors.Wrap(err, "save post data field")
-	}
-	return g, nil
-}
-
-func (r *posterRepo) Update(ctx context.Context, g *biz.Post) (*biz.Post, error) {
-	q := r.data.DB.Post.WithContext(ctx)
-
-	postEnt := &model.Post{
-		ID:      g.Id,
-		Title:   g.Title,
-		Content: g.Content,
-	}
-	if err := q.Save(postEnt); err != nil {
+	if _, err := q.Updates(postEnt); err != nil {
 		return nil, errors.Wrap(err, "save post data field")
 	}
 	return g, nil

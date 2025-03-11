@@ -30,7 +30,7 @@ func NewHTTPServer(
 		http.Middleware(
 			logging.Server(logger),
 			recovery.Recovery(),
-			validate.Validator(logger),
+			validate.Validator(),
 			selector.Server(recovery.Recovery(), tracing.Server()).Prefix("/api").Build(),
 			middlewares.Jwt(confJwt.GetAccessSecret()),
 		),

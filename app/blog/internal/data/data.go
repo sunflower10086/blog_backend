@@ -2,7 +2,6 @@ package data
 
 import (
 	"database/sql"
-
 	"sunflower-blog-svc/app/blog/internal/conf"
 	"sunflower-blog-svc/app/blog/internal/data/gormgen/query"
 

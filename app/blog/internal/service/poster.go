@@ -56,17 +56,22 @@ func (s *PosterService) ListPosts(ctx context.Context, req *pb.ListPostsRequest)
 }
 
 func (s *PosterService) GetPost(ctx context.Context, req *pb.GetPostRequest) (*pb.Post, error) {
+	post, err := s.postUc.GetPostInfo(ctx, req.PostId)
+	if err != nil {
+		return nil, err
+	}
+
 	return &pb.Post{
 		BaseInfo: &pb.PostBaseInfo{
-			Title:      "test",
-			Id:         1,
-			CreatedAt:  int32(time.Now().Unix()),
-			UpdatedAt:  int32(time.Now().Unix()),
-			Tags:       []int32{1, 2},
-			CategoryId: 1,
-			Cover:      "https://hibug.bj.bcebos.com/study-analysis/105217275132383232/105217275132383232_175173842891706368_1_0_1735895898.png",
+			Title:      post.Title,
+			Id:         int32(post.Id),
+			CreatedAt:  int32(post.CreatedAt),
+			UpdatedAt:  int32(post.UpdatedAt),
+			Tags:       post.Tags,
+			CategoryId: int32(post.CategoryId),
+			Cover:      post.Cover,
 		},
-		Content: "test_content",
+		Content: post.Content,
 	}, nil
 }
 
@@ -107,7 +112,7 @@ func (s *PosterService) UpdatePost(ctx context.Context, req *pb.UpdatePostReques
 		CategoryId: int64(req.Post.BaseInfo.CategoryId),
 	}
 
-	err := s.postUc.SavePost(ctx, bizPost)
+	err := s.postUc.UpdatePost(ctx, bizPost)
 	if err != nil {
 		return nil, err
 	}

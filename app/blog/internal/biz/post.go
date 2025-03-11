@@ -32,7 +32,6 @@ func (p *Post) String() string {
 
 // PosterRepo is a Greater userRepo.
 type PosterRepo interface {
-	Save(context.Context, *Post) (*Post, error)
 	Update(context.Context, *Post) (*Post, error)
 	FindByID(context.Context, int64) (*Post, error)
 	List(ctx context.Context, pageNum int, pageSize int, tags []string, categories string) ([]*Post, int64, error)
@@ -49,6 +48,17 @@ type PosterUseCase struct {
 // NewPosterUseCase new a Post useCase.
 func NewPosterUseCase(repo PosterRepo, logger log.Logger) *PosterUseCase {
 	return &PosterUseCase{repo: repo, log: log.NewHelper(logger)}
+}
+
+func (uc *PosterUseCase) GetPostInfo(ctx context.Context, id int64) (*Post, error) {
+	post, err := uc.repo.FindByID(ctx, id)
+	if err != nil {
+		return nil, errx.Internal(err, "查询帖子失败").WithMetadata(map[string]string{
+			"post_id": fmt.Sprintf("%d", id),
+		})
+	}
+
+	return post, nil
 }
 
 func (uc *PosterUseCase) Posts(ctx context.Context, pageNum, pageSize int, tags []string, categories string) ([]*Post, int64, error) {
@@ -72,12 +82,10 @@ func (uc *PosterUseCase) CreatePost(ctx context.Context, post *Post) (*Post, err
 	return post, nil
 }
 
-func (uc *PosterUseCase) SavePost(ctx context.Context, post *Post) error {
-	post, err := uc.repo.Save(ctx, post)
+func (uc *PosterUseCase) UpdatePost(ctx context.Context, post *Post) error {
+	post, err := uc.repo.Update(ctx, post)
 	if err != nil {
-		err = errx.Internal(err, "保存帖子失败").WithMetadata(map[string]string{
-			"post": post.String(),
-		})
+		err = errx.Internal(err, "保存帖子失败")
 		return err
 	}
 	return nil
