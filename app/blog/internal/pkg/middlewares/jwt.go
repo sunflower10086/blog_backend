@@ -21,14 +21,24 @@ var noNeedLogin = map[string]struct{}{
 	v1.OperationUserRootUserInfo: {},
 }
 
+var NeedLogin = map[string]struct{}{
+	v1.OperationPosterCreatePost: {},
+	v1.OperationPosterUpdatePost: {},
+	v1.OperationUserUserInfo:     {},
+}
+
 var ErrUnauthorized = errx.New(codex.CodeNeedLogin, "授权已过期或授权异常,请重新授权")
 
 func NewWhiteListMatcher() selector.MatchFunc {
 	return func(ctx context.Context, operation string) bool {
-		if _, ok := noNeedLogin[operation]; ok {
-			return false
+		//if _, ok := noNeedLogin[operation]; ok {
+		//	return false
+		//}
+		//return true
+		if _, ok := NeedLogin[operation]; ok {
+			return true
 		}
-		return true
+		return false
 	}
 }
 
