@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package blog.v1;
+
+import "validate/validate.proto";
+
+option go_package = "sunflower-blog-svc/api/blog/v1;v1";
+
+message IdList {
+  repeated int32 ids = 1;
+}
+
+message Id {
+  int32 id = 1 [(validate.rules).int32.gt = 0];
+}

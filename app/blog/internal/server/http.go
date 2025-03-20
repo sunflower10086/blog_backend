@@ -6,6 +6,7 @@ import (
 	"sunflower-blog-svc/app/blog/internal/conf"
 	"sunflower-blog-svc/app/blog/internal/pkg/middlewares"
 	"sunflower-blog-svc/app/blog/internal/service"
+	"sunflower-blog-svc/app/blog/internal/service/poster"
 	"sunflower-blog-svc/pkg/httpencoder"
 	"sunflower-blog-svc/pkg/middlewares/validate"
 
@@ -21,7 +22,7 @@ import (
 func NewHTTPServer(
 	bc *conf.Bootstrap,
 	user *service.UserService,
-	poster *service.PosterService,
+	poster *poster.PosterService,
 	logger log.Logger,
 ) *http.Server {
 	c := bc.Server

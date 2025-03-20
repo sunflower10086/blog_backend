@@ -14,6 +14,7 @@ import (
 	"sunflower-blog-svc/app/blog/internal/data"
 	"sunflower-blog-svc/app/blog/internal/server"
 	"sunflower-blog-svc/app/blog/internal/service"
+	"sunflower-blog-svc/app/blog/internal/service/poster"
 )
 
 import (
@@ -42,7 +43,7 @@ func wireApp(confServer *conf.Server, confData *conf.Data, bootstrap *conf.Boots
 	tagUseCase := biz.NewTagUseCase(tagRepo, logger)
 	categoryRepo := data.NewCategoryRepo(dataData, logger)
 	categoryUseCase := biz.NewCategoryUseCase(categoryRepo, logger)
-	posterService := service.NewPosterService(posterUseCase, tagUseCase, categoryUseCase, logger)
+	posterService := poster.NewPosterService(posterUseCase, tagUseCase, categoryUseCase, logger)
 	grpcServer := server.NewGRPCServer(confServer, userService, posterService, logger)
 	httpServer := server.NewHTTPServer(bootstrap, userService, posterService, logger)
 	app := newApp(logger, grpcServer, httpServer)

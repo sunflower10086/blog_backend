@@ -19,8 +19,8 @@ type userRepo struct {
 }
 
 func (u *userRepo) FindByAccount(ctx context.Context, account string) (*biz.User, error) {
-	userQuery := u.data.DB.User
-	user, err := userQuery.WithContext(ctx).Where(userQuery.Account.Eq(account)).First()
+	user := &model.User{}
+	err := u.data.DB.WithContext(ctx).Where("account = ?", account).First(user).Error
 
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
@@ -40,7 +40,6 @@ func (u *userRepo) FindByAccount(ctx context.Context, account string) (*biz.User
 }
 
 func (u *userRepo) Save(ctx context.Context, user *biz.User) (*biz.User, error) {
-	userQuery := u.data.DB.User.WithContext(ctx)
 	userModel := &model.User{
 		ID:          user.Id,
 		Account:     user.Account,
@@ -49,7 +48,7 @@ func (u *userRepo) Save(ctx context.Context, user *biz.User) (*biz.User, error) 
 		Username:    user.UserName,
 	}
 
-	if err := userQuery.Save(userModel); err != nil {
+	if err := u.data.DB.WithContext(ctx).Save(userModel).Error; err != nil {
 		return nil, errors.Wrap(err, "创建用户失败")
 	}
 
@@ -62,8 +61,8 @@ func (u *userRepo) Update(ctx context.Context, user *biz.User) (*biz.User, error
 }
 
 func (u *userRepo) FindByID(ctx context.Context, i int64) (*biz.User, error) {
-	userQuery := u.data.DB.User
-	user, err := userQuery.WithContext(ctx).Where(userQuery.ID.Eq(i)).First()
+	user := &model.User{}
+	err := u.data.DB.WithContext(ctx).Where("id = ?", i).First(user).Error
 
 	switch err {
 	case nil:

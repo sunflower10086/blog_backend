@@ -1,11 +1,11 @@
 package data
 
 import (
-	"gorm.io/gen"
+	"gorm.io/gorm"
 )
 
-func Paginate(pageNum, pageSize int64) func(db gen.Dao) gen.Dao {
-	return func(db gen.Dao) gen.Dao {
+func Paginate(pageNum, pageSize int64) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
 		if pageNum <= 0 {
 			pageNum = 1
 		}

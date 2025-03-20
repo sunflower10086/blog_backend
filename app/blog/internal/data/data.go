@@ -2,8 +2,8 @@ package data
 
 import (
 	"database/sql"
+
 	"sunflower-blog-svc/app/blog/internal/conf"
-	"sunflower-blog-svc/app/blog/internal/data/gormgen/query"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
@@ -19,19 +19,19 @@ var ProviderSet = wire.NewSet(NewData, NewPosterRepo, NewPostgresDB, NewUserRepo
 
 // Data .
 type Data struct {
-	DB *query.Query
+	DB *gorm.DB
 }
 
 // NewData .
 func NewData(c *conf.Data, logger log.Logger, db *gorm.DB) (*Data, func(), error) {
-	queryDB := query.Use(db)
+	// queryDB := query.Use(db)
 
 	cleanup := func() {
 		log.NewHelper(logger).Info("closing the data resources")
 	}
 
 	return &Data{
-		DB: queryDB,
+		DB: db,
 	}, cleanup, nil
 }
 

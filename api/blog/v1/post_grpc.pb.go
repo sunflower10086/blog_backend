@@ -25,7 +25,10 @@ const (
 	Poster_DeletePost_FullMethodName   = "/blog.v1.Poster/DeletePost"
 	Poster_ListPosts_FullMethodName    = "/blog.v1.Poster/ListPosts"
 	Poster_GetPost_FullMethodName      = "/blog.v1.Poster/GetPost"
+	Poster_CreateTags_FullMethodName   = "/blog.v1.Poster/CreateTags"
 	Poster_ListTags_FullMethodName     = "/blog.v1.Poster/ListTags"
+	Poster_DelTags_FullMethodName      = "/blog.v1.Poster/DelTags"
+	Poster_StatTags_FullMethodName     = "/blog.v1.Poster/StatTags"
 	Poster_ListCategory_FullMethodName = "/blog.v1.Poster/ListCategory"
 )
 
@@ -42,7 +45,12 @@ type PosterClient interface {
 	ListPosts(ctx context.Context, in *ListPostsRequest, opts ...grpc.CallOption) (*ListPostsResponse, error)
 	// 获取单个博客详情
 	GetPost(ctx context.Context, in *GetPostRequest, opts ...grpc.CallOption) (*Post, error)
+	// ----------------------- tag -----------------------------
+	CreateTags(ctx context.Context, in *CreateTagsReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ListTags(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListTagsResp, error)
+	DelTags(ctx context.Context, in *Id, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	StatTags(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*StatTagsResp, error)
+	// ----------------------- category -----------------------------
 	ListCategory(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListCategoryResp, error)
 }
 
@@ -104,10 +112,40 @@ func (c *posterClient) GetPost(ctx context.Context, in *GetPostRequest, opts ...
 	return out, nil
 }
 
+func (c *posterClient) CreateTags(ctx context.Context, in *CreateTagsReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Poster_CreateTags_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *posterClient) ListTags(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListTagsResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListTagsResp)
 	err := c.cc.Invoke(ctx, Poster_ListTags_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *posterClient) DelTags(ctx context.Context, in *Id, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Poster_DelTags_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *posterClient) StatTags(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*StatTagsResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StatTagsResp)
+	err := c.cc.Invoke(ctx, Poster_StatTags_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +175,12 @@ type PosterServer interface {
 	ListPosts(context.Context, *ListPostsRequest) (*ListPostsResponse, error)
 	// 获取单个博客详情
 	GetPost(context.Context, *GetPostRequest) (*Post, error)
+	// ----------------------- tag -----------------------------
+	CreateTags(context.Context, *CreateTagsReq) (*emptypb.Empty, error)
 	ListTags(context.Context, *emptypb.Empty) (*ListTagsResp, error)
+	DelTags(context.Context, *Id) (*emptypb.Empty, error)
+	StatTags(context.Context, *emptypb.Empty) (*StatTagsResp, error)
+	// ----------------------- category -----------------------------
 	ListCategory(context.Context, *emptypb.Empty) (*ListCategoryResp, error)
 	mustEmbedUnimplementedPosterServer()
 }
@@ -164,8 +207,17 @@ func (UnimplementedPosterServer) ListPosts(context.Context, *ListPostsRequest) (
 func (UnimplementedPosterServer) GetPost(context.Context, *GetPostRequest) (*Post, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPost not implemented")
 }
+func (UnimplementedPosterServer) CreateTags(context.Context, *CreateTagsReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateTags not implemented")
+}
 func (UnimplementedPosterServer) ListTags(context.Context, *emptypb.Empty) (*ListTagsResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListTags not implemented")
+}
+func (UnimplementedPosterServer) DelTags(context.Context, *Id) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelTags not implemented")
+}
+func (UnimplementedPosterServer) StatTags(context.Context, *emptypb.Empty) (*StatTagsResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StatTags not implemented")
 }
 func (UnimplementedPosterServer) ListCategory(context.Context, *emptypb.Empty) (*ListCategoryResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListCategory not implemented")
@@ -281,6 +333,24 @@ func _Poster_GetPost_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Poster_CreateTags_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateTagsReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PosterServer).CreateTags(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Poster_CreateTags_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PosterServer).CreateTags(ctx, req.(*CreateTagsReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Poster_ListTags_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
@@ -295,6 +365,42 @@ func _Poster_ListTags_Handler(srv interface{}, ctx context.Context, dec func(int
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(PosterServer).ListTags(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Poster_DelTags_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Id)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PosterServer).DelTags(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Poster_DelTags_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PosterServer).DelTags(ctx, req.(*Id))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Poster_StatTags_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PosterServer).StatTags(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Poster_StatTags_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PosterServer).StatTags(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -345,8 +451,20 @@ var Poster_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Poster_GetPost_Handler,
 		},
 		{
+			MethodName: "CreateTags",
+			Handler:    _Poster_CreateTags_Handler,
+		},
+		{
 			MethodName: "ListTags",
 			Handler:    _Poster_ListTags_Handler,
+		},
+		{
+			MethodName: "DelTags",
+			Handler:    _Poster_DelTags_Handler,
+		},
+		{
+			MethodName: "StatTags",
+			Handler:    _Poster_StatTags_Handler,
 		},
 		{
 			MethodName: "ListCategory",

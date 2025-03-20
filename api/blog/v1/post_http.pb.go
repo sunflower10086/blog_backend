@@ -21,22 +21,30 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationPosterCreatePost = "/blog.v1.Poster/CreatePost"
+const OperationPosterCreateTags = "/blog.v1.Poster/CreateTags"
+const OperationPosterDelTags = "/blog.v1.Poster/DelTags"
 const OperationPosterDeletePost = "/blog.v1.Poster/DeletePost"
 const OperationPosterGetPost = "/blog.v1.Poster/GetPost"
 const OperationPosterListCategory = "/blog.v1.Poster/ListCategory"
 const OperationPosterListPosts = "/blog.v1.Poster/ListPosts"
 const OperationPosterListTags = "/blog.v1.Poster/ListTags"
+const OperationPosterStatTags = "/blog.v1.Poster/StatTags"
 const OperationPosterUpdatePost = "/blog.v1.Poster/UpdatePost"
 
 type PosterHTTPServer interface {
 	CreatePost(context.Context, *CreatePostRequest) (*Post, error)
+	// CreateTags ----------------------- tag -----------------------------
+	CreateTags(context.Context, *CreateTagsReq) (*emptypb.Empty, error)
+	DelTags(context.Context, *Id) (*emptypb.Empty, error)
 	DeletePost(context.Context, *DeletePostRequest) (*emptypb.Empty, error)
 	// GetPost 获取单个博客详情
 	GetPost(context.Context, *GetPostRequest) (*Post, error)
+	// ListCategory ----------------------- category -----------------------------
 	ListCategory(context.Context, *emptypb.Empty) (*ListCategoryResp, error)
 	// ListPosts 获取博客列表
 	ListPosts(context.Context, *ListPostsRequest) (*ListPostsResponse, error)
 	ListTags(context.Context, *emptypb.Empty) (*ListTagsResp, error)
+	StatTags(context.Context, *emptypb.Empty) (*StatTagsResp, error)
 	UpdatePost(context.Context, *UpdatePostRequest) (*Post, error)
 }
 
@@ -47,7 +55,10 @@ func RegisterPosterHTTPServer(s *http.Server, srv PosterHTTPServer) {
 	r.DELETE("/api/v1/post/{post_id}", _Poster_DeletePost0_HTTP_Handler(srv))
 	r.GET("/api/v1/posts", _Poster_ListPosts0_HTTP_Handler(srv))
 	r.GET("/api/v1/post/{post_id}", _Poster_GetPost0_HTTP_Handler(srv))
+	r.POST("/api/v1/tags", _Poster_CreateTags0_HTTP_Handler(srv))
 	r.GET("/api/v1/tags", _Poster_ListTags0_HTTP_Handler(srv))
+	r.DELETE("/api/v1/tags/{id}", _Poster_DelTags0_HTTP_Handler(srv))
+	r.GET("/api/v1/tags/stat", _Poster_StatTags0_HTTP_Handler(srv))
 	r.GET("/api/v1/categories", _Poster_ListCategory0_HTTP_Handler(srv))
 }
 
@@ -158,6 +169,28 @@ func _Poster_GetPost0_HTTP_Handler(srv PosterHTTPServer) func(ctx http.Context) 
 	}
 }
 
+func _Poster_CreateTags0_HTTP_Handler(srv PosterHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CreateTagsReq
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPosterCreateTags)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreateTags(ctx, req.(*CreateTagsReq))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _Poster_ListTags0_HTTP_Handler(srv PosterHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in emptypb.Empty
@@ -173,6 +206,47 @@ func _Poster_ListTags0_HTTP_Handler(srv PosterHTTPServer) func(ctx http.Context)
 			return err
 		}
 		reply := out.(*ListTagsResp)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Poster_DelTags0_HTTP_Handler(srv PosterHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in Id
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPosterDelTags)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DelTags(ctx, req.(*Id))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*emptypb.Empty)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Poster_StatTags0_HTTP_Handler(srv PosterHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in emptypb.Empty
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationPosterStatTags)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.StatTags(ctx, req.(*emptypb.Empty))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*StatTagsResp)
 		return ctx.Result(200, reply)
 	}
 }
@@ -198,11 +272,14 @@ func _Poster_ListCategory0_HTTP_Handler(srv PosterHTTPServer) func(ctx http.Cont
 
 type PosterHTTPClient interface {
 	CreatePost(ctx context.Context, req *CreatePostRequest, opts ...http.CallOption) (rsp *Post, err error)
+	CreateTags(ctx context.Context, req *CreateTagsReq, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	DelTags(ctx context.Context, req *Id, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	DeletePost(ctx context.Context, req *DeletePostRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	GetPost(ctx context.Context, req *GetPostRequest, opts ...http.CallOption) (rsp *Post, err error)
 	ListCategory(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *ListCategoryResp, err error)
 	ListPosts(ctx context.Context, req *ListPostsRequest, opts ...http.CallOption) (rsp *ListPostsResponse, err error)
 	ListTags(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *ListTagsResp, err error)
+	StatTags(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *StatTagsResp, err error)
 	UpdatePost(ctx context.Context, req *UpdatePostRequest, opts ...http.CallOption) (rsp *Post, err error)
 }
 
@@ -221,6 +298,32 @@ func (c *PosterHTTPClientImpl) CreatePost(ctx context.Context, in *CreatePostReq
 	opts = append(opts, http.Operation(OperationPosterCreatePost))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *PosterHTTPClientImpl) CreateTags(ctx context.Context, in *CreateTagsReq, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/api/v1/tags"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationPosterCreateTags))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *PosterHTTPClientImpl) DelTags(ctx context.Context, in *Id, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
+	pattern := "/api/v1/tags/{id}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationPosterDelTags))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -284,6 +387,19 @@ func (c *PosterHTTPClientImpl) ListTags(ctx context.Context, in *emptypb.Empty, 
 	pattern := "/api/v1/tags"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationPosterListTags))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *PosterHTTPClientImpl) StatTags(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*StatTagsResp, error) {
+	var out StatTagsResp
+	pattern := "/api/v1/tags/stat"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationPosterStatTags))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"sunflower-blog-svc/app/blog/internal/biz"
+	"sunflower-blog-svc/app/blog/internal/data/gormgen/model"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/pkg/errors"
@@ -24,17 +25,17 @@ func NewCategoryRepo(data *Data, logger log.Logger) biz.CategoryRepo {
 }
 
 func (t *categoryRepo) CategoryList(ctx context.Context) ([]*biz.Category, error) {
-	CategoryQuery := t.data.DB.Category
-	Categories, err := CategoryQuery.WithContext(ctx).Find()
+	categories := make([]*model.Category, 0)
+	err := t.data.DB.WithContext(ctx).Find(&categories).Error
 	if err != nil {
 		return nil, errors.Wrap(err, "ListCategory")
 	}
 
 	res := make([]*biz.Category, 0)
-	for _, Category := range Categories {
+	for _, category := range categories {
 		res = append(res, &biz.Category{
-			Id:   int64(Category.ID),
-			Name: Category.Name,
+			Id:   int64(category.ID),
+			Name: category.Name,
 		})
 	}
 	return res, nil

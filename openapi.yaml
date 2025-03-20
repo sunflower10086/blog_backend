@@ -10,6 +10,7 @@ paths:
         get:
             tags:
                 - Poster
+            description: '----------------------- category -----------------------------'
             operationId: Poster_ListCategory
             responses:
                 "200":
@@ -64,7 +65,8 @@ paths:
                   in: path
                   required: true
                   schema:
-                    type: string
+                    type: integer
+                    format: int32
             responses:
                 "200":
                     description: OK
@@ -123,6 +125,49 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/blog.v1.ListTagsResp'
+        post:
+            tags:
+                - Poster
+            description: '----------------------- tag -----------------------------'
+            operationId: Poster_CreateTags
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/blog.v1.CreateTagsReq'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /api/v1/tags/stat:
+        get:
+            tags:
+                - Poster
+            operationId: Poster_StatTags
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/blog.v1.StatTagsResp'
+    /api/v1/tags/{id}:
+        delete:
+            tags:
+                - Poster
+            operationId: Poster_DelTags
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content: {}
     /api/v1/user:
         get:
             tags:
@@ -220,6 +265,13 @@ components:
                     format: int32
                 content:
                     type: string
+        blog.v1.CreateTagsReq:
+            type: object
+            properties:
+                names:
+                    type: array
+                    items:
+                        type: string
         blog.v1.ListCategoryResp:
             type: object
             properties:
@@ -252,15 +304,7 @@ components:
                 tags:
                     type: array
                     items:
-                        $ref: '#/components/schemas/blog.v1.ListTagsResp_Tag'
-        blog.v1.ListTagsResp_Tag:
-            type: object
-            properties:
-                id:
-                    type: integer
-                    format: int32
-                name:
-                    type: string
+                        $ref: '#/components/schemas/blog.v1.Tag'
         blog.v1.Post:
             type: object
             properties:
@@ -295,6 +339,32 @@ components:
                 categoryId:
                     type: integer
                     format: int32
+        blog.v1.StatTagsResp:
+            type: object
+            properties:
+                tagStat:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/blog.v1.StatTagsResp_TagStat'
+        blog.v1.StatTagsResp_TagStat:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                name:
+                    type: string
+                count:
+                    type: integer
+                    format: int32
+        blog.v1.Tag:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int32
+                name:
+                    type: string
         blog.v1.UpdatePostRequest:
             type: object
             properties:

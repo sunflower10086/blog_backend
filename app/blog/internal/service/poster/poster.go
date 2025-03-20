@@ -1,4 +1,4 @@
-package service
+package poster
 
 import (
 	"context"
@@ -56,7 +56,7 @@ func (s *PosterService) ListPosts(ctx context.Context, req *pb.ListPostsRequest)
 }
 
 func (s *PosterService) GetPost(ctx context.Context, req *pb.GetPostRequest) (*pb.Post, error) {
-	post, err := s.postUc.GetPostInfo(ctx, req.PostId)
+	post, err := s.postUc.GetPostInfo(ctx, int64(req.PostId))
 	if err != nil {
 		return nil, err
 	}
@@ -124,21 +124,6 @@ func (s *PosterService) DeletePost(ctx context.Context, req *pb.DeletePostReques
 	return nil, err
 }
 
-func (s *PosterService) ListTags(ctx context.Context, req *emptypb.Empty) (*pb.ListTagsResp, error) {
-	tagList, err := s.tagUc.ListTag(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	resp := &pb.ListTagsResp{}
-	for _, tag := range tagList {
-		resp.Tags = append(resp.Tags, &pb.ListTagsResp_Tag{
-			Id:   int32(tag.Id),
-			Name: tag.Name,
-		})
-	}
-	return resp, nil
-}
 func (s *PosterService) ListCategory(ctx context.Context, req *emptypb.Empty) (*pb.ListCategoryResp, error) {
 	categoryList, err := s.categoryUc.ListCategory(ctx)
 	if err != nil {

@@ -3,7 +3,8 @@ package data
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+
+	"sunflower-blog-svc/app/blog/internal/data/converter"
 
 	"sunflower-blog-svc/app/blog/internal/biz"
 	"sunflower-blog-svc/app/blog/internal/data/gormgen/model"
@@ -31,18 +32,16 @@ func NewPosterRepo(data *Data, logger log.Logger) biz.PosterRepo {
 }
 
 func (r *posterRepo) Create(ctx context.Context, post *biz.Post) (*biz.Post, error) {
-	q := r.data.DB.Post.WithContext(ctx)
-
 	postEnt := &model.Post{
 		Title:   post.Title,
 		Content: post.Content,
 	}
-	err := q.Create(postEnt)
+	err := r.data.DB.WithContext(ctx).Create(postEnt).Error
 	if err != nil {
 		return nil, errors.Wrap(err, "创建 post 失败")
 	}
 
-	respPost, err := postEnt.ConverterBizPost()
+	respPost, err := converter.ConverterBizPost(postEnt)
 	if err != nil {
 		return nil, errors.Wrap(err, "转换 post 失败")
 	}
@@ -51,8 +50,6 @@ func (r *posterRepo) Create(ctx context.Context, post *biz.Post) (*biz.Post, err
 }
 
 func (r *posterRepo) Update(ctx context.Context, g *biz.Post) (*biz.Post, error) {
-	q := r.data.DB.Post.WithContext(ctx)
-
 	entTags := make([]int64, 0, len(g.Tags))
 	for _, tag := range g.Tags {
 		entTags = append(entTags, int64(tag))
@@ -67,19 +64,26 @@ func (r *posterRepo) Update(ctx context.Context, g *biz.Post) (*biz.Post, error)
 		CategoryId: g.CategoryId,
 		Tags:       datatypes.JSON(entTagsBytes),
 	}
-	if _, err := q.Updates(postEnt); err != nil {
+	err := r.data.DB.WithContext(ctx).
+		Model(&model.Post{}).
+		Where("id = ?", g.Id).
+		Updates(postEnt).Error
+	if err != nil {
 		return nil, errors.Wrap(err, "save post data field")
 	}
 	return g, nil
 }
 
 func (r *posterRepo) FindByID(ctx context.Context, postId int64) (*biz.Post, error) {
-	q := r.data.DB.Post
-	post, err := q.WithContext(ctx).Where(q.ID.Eq(postId)).First()
+	post := &model.Post{}
+	err := r.data.DB.WithContext(ctx).
+		Model(&model.Post{}).
+		Where("id = ?", postId).
+		First(post).Error
 
 	switch {
 	case err == nil:
-		return post.ConverterBizPost()
+		return converter.ConverterBizPost(post)
 	case errors.Is(err, gorm.ErrRecordNotFound):
 		r.log.WithContext(ctx).Errorf("post is not found, post_id:{%d}", postId)
 		return nil, err
@@ -89,36 +93,40 @@ func (r *posterRepo) FindByID(ctx context.Context, postId int64) (*biz.Post, err
 }
 
 func (r *posterRepo) List(ctx context.Context, pageNum int, pageSize int, tags []string, categories string) ([]*biz.Post, int64, error) {
-	q := r.data.DB.Post
-	query1 := q.WithContext(ctx).Scopes(Paginate(int64(pageNum), int64(pageSize))).Order(q.ID.Desc())
+	query1 := r.data.DB.WithContext(ctx).
+		Model(&model.Post{}).
+		Scopes(Paginate(int64(pageNum), int64(pageSize))).
+		Order("id DESC")
 
-	total, err := query1.Count()
+	var total int64
+	err := query1.Count(&total).Error
 	if err != nil {
 		return nil, 0, errors.Wrap(err, "查询帖子总数出错")
 	}
 
-	postList, err := query1.Find()
+	postList := make([]*model.Post, 0)
+	err = query1.Find(&postList).Error
 	if err != nil {
 		return nil, 0, errors.Wrap(err, "查询帖子出错")
 	}
 
 	resp := make([]*biz.Post, 0, len(postList))
 	for _, post := range postList {
-		bizPost, err := post.ConverterBizPost()
+		bizPost, err := converter.ConverterBizPost(post)
 		if err != nil {
 			return nil, 0, errors.Wrap(err, "转换post出错")
 		}
 		resp = append(resp, bizPost)
 	}
 
-	fmt.Println(resp)
-
 	return resp, total, nil
 }
 
 func (r *posterRepo) Delete(ctx context.Context, id int64) error {
-	postQuery := r.data.DB.Post
-	_, err := postQuery.WithContext(ctx).Delete(&model.Post{ID: id})
+	err := r.data.DB.WithContext(ctx).
+		Model(&model.Post{}).
+		Where("id = ?", id).
+		Delete(&model.Post{}).Error
 	if err != nil {
 		return errors.Wrap(err, "删除帖子出错")
 	}

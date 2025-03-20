@@ -5,6 +5,7 @@ package blog.v1;
 import "google/api/annotations.proto";
 import "validate/validate.proto";  // 导入 validate 库
 import "google/protobuf/empty.proto";
+import "blog/v1/common.proto";
 
 option go_package = "sunflower-blog-svc/api/blog/v1;v1";
 
@@ -44,12 +45,33 @@ service Poster {
     };
   }
 
+  // ----------------------- tag -----------------------------
+  rpc CreateTags (CreateTagsReq) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/tags"
+      body: "*"
+    };
+  }
+
   rpc ListTags (google.protobuf.Empty) returns (ListTagsResp) {
     option (google.api.http) = {
       get: "/api/v1/tags"
     };
   }
 
+  rpc DelTags (blog.v1.Id) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/tags/{id}"
+    };
+  }
+
+  rpc StatTags (google.protobuf.Empty) returns (StatTagsResp) {
+    option (google.api.http) = {
+      get: "/api/v1/tags/stat"
+    };
+  }
+
+  // ----------------------- category -----------------------------
   rpc ListCategory (google.protobuf.Empty) returns (ListCategoryResp) {
     option (google.api.http) = {
       get: "/api/v1/categories"
@@ -65,11 +87,25 @@ message ListCategoryResp {
   repeated Category categories = 1;
 }
 
-message ListTagsResp {
-  message Tag {
+message Tag {
+  int32 id = 1;
+  string name = 2;
+}
+
+message StatTagsResp {
+  message TagStat {
     int32 id = 1;
     string name = 2;
+    int32 count = 3;
   }
+  repeated TagStat tagStat = 1;
+}
+
+message CreateTagsReq {
+  repeated string names = 1;
+}
+
+message ListTagsResp {
   repeated Tag tags = 1;
 }
 
@@ -87,7 +123,7 @@ message ListPostsResponse {
 
 // 获取单个博客的请求
 message GetPostRequest {
-  string post_id = 1 [(validate.rules).string.min_len = 1];
+  int32 post_id = 1 [(validate.rules).int32.gte = 1];
 }
 
 message PostBaseInfo {

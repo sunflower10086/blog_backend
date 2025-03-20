@@ -1,12 +1,13 @@
 package main
 
 import (
+	"sunflower-blog-svc/app/blog/internal/data/gormgen/model"
+	"sunflower-blog-svc/pkg/helper/encrypt"
+
 	"github.com/go-kratos/kratos/v2/log"
 	"gorm.io/driver/postgres"
 	"gorm.io/gen"
 	"gorm.io/gorm"
-	"sunflower-blog-svc/app/blog/internal/data/gormgen/model"
-	"sunflower-blog-svc/pkg/helper/encrypt"
 )
 
 var (
@@ -42,7 +43,7 @@ func main() {
 	// tableList = relationship(tableList) //需要处理关系的表
 
 	// 其他默认的表
-	g.ApplyBasic(model.Post{}, model.User{}, model.Tag{}, model.Category{})
+	// g.ApplyBasic(model.Post{}, model.User{}, model.Tag{}, model.Category{})
 	// g.ApplyInterface(func(CommonDao) {}, g.GenerateModel("la_user"))
 	g.Execute()
 
