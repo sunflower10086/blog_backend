@@ -95,7 +95,6 @@ func (r *posterRepo) FindByID(ctx context.Context, postId int64) (*biz.Post, err
 func (r *posterRepo) List(ctx context.Context, pageNum int, pageSize int, tags []string, categories string) ([]*biz.Post, int64, error) {
 	query1 := r.data.DB.WithContext(ctx).
 		Model(&model.Post{}).
-		Scopes(Paginate(int64(pageNum), int64(pageSize))).
 		Order("id DESC")
 
 	var total int64
@@ -105,7 +104,9 @@ func (r *posterRepo) List(ctx context.Context, pageNum int, pageSize int, tags [
 	}
 
 	postList := make([]*model.Post, 0)
-	err = query1.Find(&postList).Error
+	err = query1.
+		Scopes(Paginate(int64(pageNum), int64(pageSize))).
+		Find(&postList).Error
 	if err != nil {
 		return nil, 0, errors.Wrap(err, "查询帖子出错")
 	}
