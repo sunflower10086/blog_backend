@@ -21,6 +21,7 @@ type Post struct {
 	Cover      string         `gorm:"column:cover;type:varchar(255);not null" json:"cover"`
 	CategoryId int64          `gorm:"column:category_id;type:int2;not null;default:0" json:"category_id"`
 	Tags       datatypes.JSON `gorm:"column:tags;type:jsonb;default:'[]'" json:"tags"`
+	Views      int64          `gorm:"column:views;type:int4;not null;default:0" json:"views"`
 }
 
 // TableName Post's table name

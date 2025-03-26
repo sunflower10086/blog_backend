@@ -135,6 +135,7 @@ message PostBaseInfo {
   int32 created_at = 6;
   int32 updated_at = 7;
   int32 category_id = 8;
+  int32 views = 9;
 }
 
 // 博客实体

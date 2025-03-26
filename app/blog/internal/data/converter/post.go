@@ -22,5 +22,6 @@ func ConverterBizPost(p *model.Post) (*biz.Post, error) {
 		Tags:       tags,
 		Cover:      p.Cover,
 		CategoryId: p.CategoryId,
+		Views:      p.Views,
 	}, nil
 }

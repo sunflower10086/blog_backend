@@ -22,11 +22,11 @@ import (
 var WrongUserNameOrPassword = errx.New(codex.CodeWrongUserNameOrPassword, "数据库找不到用户")
 
 type User struct {
-	Id          int64
-	UserName    string
-	Account     string
-	Password    string
-	Description string
+	Id          int64  `json:"id"`
+	UserName    string `json:"user_name"`
+	Account     string `json:"account"`
+	Password    string `json:"password"`
+	Description string `json:"description"`
 }
 
 type Token struct {

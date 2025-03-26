@@ -339,6 +339,9 @@ components:
                 categoryId:
                     type: integer
                     format: int32
+                views:
+                    type: integer
+                    format: int32
         blog.v1.StatTagsResp:
             type: object
             properties:

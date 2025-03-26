@@ -1044,6 +1044,8 @@ func (m *PostBaseInfo) validate(all bool) error {
 
 	// no validation rules for CategoryId
 
+	// no validation rules for Views
+
 	if len(errors) > 0 {
 		return PostBaseInfoMultiError(errors)
 	}

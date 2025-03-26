@@ -61,6 +61,12 @@ func (s *PosterService) GetPost(ctx context.Context, req *pb.GetPostRequest) (*p
 		return nil, err
 	}
 
+	go func() {
+		if inErr := s.postUc.IncrViews(ctx, int(req.PostId)); inErr != nil {
+			log.Errorf("增加帖子浏览量失败: %v", inErr)
+		}
+	}()
+
 	return &pb.Post{
 		BaseInfo: &pb.PostBaseInfo{
 			Title:      post.Title,

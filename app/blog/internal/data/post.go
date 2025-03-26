@@ -134,3 +134,15 @@ func (r *posterRepo) Delete(ctx context.Context, id int64) error {
 
 	return nil
 }
+
+func (r *posterRepo) IncrViews(ctx context.Context, postId int) error {
+	err := r.data.DB.WithContext(ctx).
+		Model(&model.Post{}).
+		Where("id = ?", postId).
+		Update("views", gorm.Expr("views + ?", 1)).Error
+	if err != nil {
+		return errors.Wrap(err, "更新帖子浏览量出错")
+	}
+
+	return nil
+}

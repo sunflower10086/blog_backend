@@ -15,14 +15,15 @@ var (
 
 // Post is a Post view object.
 type Post struct {
-	Id         int64
-	Title      string
-	CreatedAt  int64
-	UpdatedAt  int64
-	Content    string
-	Cover      string
-	Tags       []int32
-	CategoryId int64
+	Id         int64   `json:"id"`
+	Title      string  `json:"title"`
+	CreatedAt  int64   `json:"created_at"`
+	UpdatedAt  int64   `json:"updated_at"`
+	Content    string  `json:"content"`
+	Cover      string  `json:"cover"`
+	Tags       []int32 `json:"tags"`
+	CategoryId int64   `json:"category_id"`
+	Views      int64   `json:"views"`
 }
 
 func (p *Post) String() string {
@@ -36,6 +37,8 @@ type PosterRepo interface {
 	List(ctx context.Context, pageNum int, pageSize int, tags []string, categories string) ([]*Post, int64, error)
 	Create(ctx context.Context, post *Post) (*Post, error)
 	Delete(ctx context.Context, id int64) error
+
+	IncrViews(ctx context.Context, id int) error
 }
 
 // PosterUseCase is a Post useCase.
@@ -98,5 +101,17 @@ func (uc *PosterUseCase) DelPost(ctx context.Context, id int64) error {
 		})
 		return err
 	}
+	return nil
+}
+
+func (uc *PosterUseCase) IncrViews(ctx context.Context, postId int) error {
+	err := uc.repo.IncrViews(ctx, postId)
+	if err != nil {
+		err = errx.Internal(err, "增加帖子浏览量失败").WithMetadata(map[string]string{
+			"post_id": fmt.Sprintf("%d", postId),
+		})
+		return err
+	}
+
 	return nil
 }
