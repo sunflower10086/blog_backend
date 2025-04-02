@@ -62,7 +62,7 @@ func (s *PosterService) GetPost(ctx context.Context, req *pb.GetPostRequest) (*p
 	}
 
 	go func() {
-		if inErr := s.postUc.IncrViews(ctx, int(req.PostId)); inErr != nil {
+		if inErr := s.postUc.IncrViews(context.Background(), int(req.PostId)); inErr != nil {
 			log.Errorf("增加帖子浏览量失败: %v", inErr)
 		}
 	}()
@@ -76,6 +76,7 @@ func (s *PosterService) GetPost(ctx context.Context, req *pb.GetPostRequest) (*p
 			Tags:       post.Tags,
 			CategoryId: int32(post.CategoryId),
 			Cover:      post.Cover,
+			Views:      int32(post.Views),
 		},
 		Content: post.Content,
 	}, nil
