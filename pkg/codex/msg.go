@@ -1,8 +1,11 @@
 package codex
 
 var codeMsgMap = map[ResCode]string{
-	CodeSuccess:                 "操作成功",
-	CodeInvalidParams:           "请求参数错误",
+	CodeSuccess:           "操作成功",
+	CodeInvalidParams:     "请求参数错误",
+	CodeInvalidTags:       "非法的 tagsId",
+	CodeInvalidCategoryId: "非法的类别Id",
+
 	CodeNeedLogin:               "请先登陆",
 	CodeCasbinError:             "没有该API接口访问权限",
 	CodeBusinessTypeErr:         "业务类型错误",

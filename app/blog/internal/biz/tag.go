@@ -2,6 +2,7 @@ package biz
 
 import (
 	"context"
+	"fmt"
 
 	"sunflower-blog-svc/pkg/errx"
 
@@ -22,6 +23,8 @@ type TagRepo interface {
 
 	BatchCreateTag(ctx context.Context, tx *gorm.DB, tag []*Tag) error
 	DelTag(ctx context.Context, tx *gorm.DB, id int64) error
+
+	CountByIds(cxt context.Context, ids []int32) (int64, error)
 }
 
 type TagUseCase struct {
@@ -71,4 +74,16 @@ func (uc *TagUseCase) TagWithCount(ctx context.Context) (map[int][]*Tag, error) 
 		return nil, err
 	}
 	return tagMap, nil
+}
+
+func (uc *TagUseCase) TagsIsExist(ctx context.Context, tags []int32) (bool, error) {
+	count, err := uc.TagRepo.CountByIds(ctx, tags)
+	if err != nil {
+		err = errx.Internal(err, "count tags 出错").WithMetadata(map[string]string{
+			"tags": fmt.Sprintf("%v", tags),
+		})
+		return false, err
+	}
+
+	return count == int64(len(tags)), nil
 }

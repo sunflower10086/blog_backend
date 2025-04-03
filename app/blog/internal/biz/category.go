@@ -2,6 +2,7 @@ package biz
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-kratos/kratos/v2/log"
 	"sunflower-blog-svc/pkg/errx"
 )
@@ -13,6 +14,8 @@ type Category struct {
 
 type CategoryRepo interface {
 	CategoryList(ctx context.Context) ([]*Category, error)
+
+	CategoryIsExist(ctx context.Context, categoryId int32) (bool, error)
 }
 
 type CategoryUseCase struct {
@@ -32,4 +35,16 @@ func (uc *CategoryUseCase) ListCategory(ctx context.Context) ([]*Category, error
 	}
 
 	return CategoryList, nil
+}
+
+func (uc *CategoryUseCase) CategoryIsExist(ctx context.Context, categoryId int32) (bool, error) {
+	exist, err := uc.CategoryRepo.CategoryIsExist(ctx, categoryId)
+	if err != nil {
+		err = errx.Internal(err, "count Category 出错").WithMetadata(map[string]string{
+			"categoryId": fmt.Sprintf("%v", categoryId),
+		})
+		return false, err
+	}
+
+	return exist, nil
 }

@@ -2,6 +2,8 @@ package data
 
 import (
 	"context"
+	"fmt"
+	"sunflower-blog-svc/pkg/errx"
 
 	"sunflower-blog-svc/app/blog/internal/data/gormgen/model"
 
@@ -17,6 +19,19 @@ var _ biz.TagRepo = (*tagRepo)(nil)
 type tagRepo struct {
 	data *Data
 	log  *log.Helper
+}
+
+func (t *tagRepo) CountByIds(ctx context.Context, ids []int32) (int64, error) {
+	var count int64
+	err := t.data.DB.WithContext(ctx).Model(&model.Tag{}).Where("id IN ?", ids).Count(&count).Error
+	if err != nil {
+		err = errx.Internal(err, "查询标签数量失败").WithMetadata(map[string]string{
+			"ids": fmt.Sprintf("%v", ids),
+		})
+		return 0, err
+	}
+
+	return count, nil
 }
 
 func (t *tagRepo) Transaction(ctx context.Context, fn func(tx *gorm.DB) error) error {

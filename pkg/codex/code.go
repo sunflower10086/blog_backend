@@ -5,7 +5,9 @@ type ResCode int
 const (
 	CodeSuccess ResCode = 200
 
-	CodeInvalidParams ResCode = 400
+	CodeInvalidParams     ResCode = 400
+	CodeInvalidTags       ResCode = 400001
+	CodeInvalidCategoryId ResCode = 400002
 
 	CodeNeedLogin       ResCode = 401
 	CodeCasbinError     ResCode = 401001

@@ -2,6 +2,9 @@ package poster
 
 import (
 	"context"
+	"fmt"
+	"sunflower-blog-svc/pkg/codex"
+	"sunflower-blog-svc/pkg/errx"
 	"time"
 
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -83,6 +86,10 @@ func (s *PosterService) GetPost(ctx context.Context, req *pb.GetPostRequest) (*p
 }
 
 func (s *PosterService) CreatePost(ctx context.Context, req *pb.CreatePostRequest) (*pb.Post, error) {
+	if err := s.validateTagsAndCategoryIdExist(ctx, req.Tags, req.CategoryId); err != nil {
+		return nil, err
+	}
+
 	bizPost := &biz.Post{
 		Title:      req.Title,
 		Content:    req.Content,
@@ -110,6 +117,10 @@ func (s *PosterService) CreatePost(ctx context.Context, req *pb.CreatePostReques
 }
 
 func (s *PosterService) UpdatePost(ctx context.Context, req *pb.UpdatePostRequest) (*pb.Post, error) {
+	if err := s.validateTagsAndCategoryIdExist(ctx, req.Post.BaseInfo.Tags, req.Post.BaseInfo.CategoryId); err != nil {
+		return nil, err
+	}
+
 	bizPost := &biz.Post{
 		Id:         int64(req.Post.BaseInfo.Id),
 		Title:      req.Post.BaseInfo.Title,
@@ -129,4 +140,33 @@ func (s *PosterService) UpdatePost(ctx context.Context, req *pb.UpdatePostReques
 func (s *PosterService) DeletePost(ctx context.Context, req *pb.DeletePostRequest) (*emptypb.Empty, error) {
 	err := s.postUc.DelPost(ctx, int64(req.PostId))
 	return nil, err
+}
+
+func (s *PosterService) validateTagsAndCategoryIdExist(ctx context.Context, tags []int32, categoryId int32) error {
+	// 校验 tags 是否合理
+	if len(tags) != 0 {
+		exist, err := s.tagUc.TagsIsExist(ctx, tags)
+		if err != nil {
+			return err
+		}
+		if !exist {
+			return errx.New(codex.CodeInvalidTags, "tagsId 不存在").WithMetadata(map[string]string{
+				"tags": fmt.Sprintf("%v", tags),
+			})
+		}
+	}
+
+	if categoryId != 0 {
+		exist, err := s.categoryUc.CategoryIsExist(ctx, categoryId)
+		if err != nil {
+			return err
+		}
+		if !exist {
+			return errx.New(codex.CodeInvalidCategoryId, "categoryId 不存在").WithMetadata(map[string]string{
+				"categoryId": fmt.Sprintf("%d", categoryId),
+			})
+		}
+	}
+
+	return nil
 }
