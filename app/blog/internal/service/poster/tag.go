@@ -4,7 +4,7 @@ import (
 	"context"
 	"sort"
 
-	pb "sunflower-blog-svc/api/blog/v1"
+	pb "sunflower-blog-svc/api/gen/blog/v1"
 	"sunflower-blog-svc/app/blog/internal/biz"
 
 	"google.golang.org/protobuf/types/known/emptypb"

@@ -10,7 +10,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	pb "sunflower-blog-svc/api/blog/v1"
+	pb "sunflower-blog-svc/api/gen/blog/v1"
 )
 
 type UserService struct {

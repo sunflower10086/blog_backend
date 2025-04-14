@@ -3,7 +3,7 @@ package middlewares
 import (
 	"context"
 
-	v1 "sunflower-blog-svc/api/blog/v1"
+	v1 "sunflower-blog-svc/api/gen/blog/v1"
 	"sunflower-blog-svc/app/blog/internal/pkg/ctxdata"
 	"sunflower-blog-svc/pkg/codex"
 	"sunflower-blog-svc/pkg/errx"

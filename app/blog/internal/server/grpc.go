@@ -1,7 +1,7 @@
 package server
 
 import (
-	v1 "sunflower-blog-svc/api/blog/v1"
+	v1 "sunflower-blog-svc/api/gen/blog/v1"
 	"sunflower-blog-svc/app/blog/internal/conf"
 	"sunflower-blog-svc/app/blog/internal/service"
 	"sunflower-blog-svc/app/blog/internal/service/poster"

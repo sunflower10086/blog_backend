@@ -13,7 +13,7 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 
-	pb "sunflower-blog-svc/api/blog/v1"
+	pb "sunflower-blog-svc/api/gen/blog/v1"
 )
 
 type PosterService struct {

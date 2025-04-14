@@ -2,7 +2,7 @@ package server
 
 import (
 	"github.com/go-kratos/kratos/v2/middleware/logging"
-	v1 "sunflower-blog-svc/api/blog/v1"
+	v1 "sunflower-blog-svc/api/gen/blog/v1"
 	"sunflower-blog-svc/app/blog/internal/conf"
 	"sunflower-blog-svc/app/blog/internal/pkg/middlewares"
 	"sunflower-blog-svc/app/blog/internal/service"

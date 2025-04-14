@@ -3,7 +3,7 @@ package poster
 import (
 	"context"
 	"google.golang.org/protobuf/types/known/emptypb"
-	pb "sunflower-blog-svc/api/blog/v1"
+	pb "sunflower-blog-svc/api/gen/blog/v1"
 )
 
 func (s *PosterService) ListCategory(ctx context.Context, req *emptypb.Empty) (*pb.ListCategoryResp, error) {
