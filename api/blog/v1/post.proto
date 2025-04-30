@@ -81,82 +81,78 @@ service Poster {
 
 message ListCategoryResp {
   message Category {
-    int32 id = 1;
-    string name = 2;
+    int32 id = 1 [json_name = "id"];
+    string name = 2 [json_name = "name"];
   }
-  repeated Category categories = 1;
+  repeated Category categories = 1 [json_name = "categories"];
 }
 
 message Tag {
-  int32 id = 1;
-  string name = 2;
+  int32 id = 1 [json_name = "id"];
+  string name = 2 [json_name = "name"];
 }
 
 message StatTagsResp {
   message TagStat {
-    int32 id = 1;
-    string name = 2;
-    int32 count = 3;
+    int32 id = 1 [json_name = "id"];
+    string name = 2 [json_name = "name"];
+    int32 count = 3 [json_name = "count"];
   }
-  repeated TagStat tagStat = 1;
+  repeated TagStat tagStat = 1 [json_name = "tag_stat"];
 }
 
 message CreateTagsReq {
-  repeated string names = 1;
+  repeated string names = 1 [json_name = "names"];
 }
 
 message ListTagsResp {
-  repeated Tag tags = 1;
+  repeated Tag tags = 1 [json_name = "tags"];
 }
 
 // 获取博客列表的请求
 message ListPostsRequest {
-  int32 page = 1 [(validate.rules).int32.gt = 0];
-  int32 page_size = 2 [(validate.rules).int32.gt = 0];
+  int32 page = 1 [(validate.rules).int32.gt = 0, json_name = "page"];
+  int32 page_size = 2 [(validate.rules).int32.gt = 0, json_name = "page_size"];
 }
 
 // 获取博客列表的响应
 message ListPostsResponse {
-  repeated PostBaseInfo posts = 1;
-  int32 total = 2;
+  repeated Post posts = 1 [json_name = "posts"];
+  int32 total = 2 [json_name = "total"];
 }
 
 // 获取单个博客的请求
 message GetPostRequest {
-  int32 post_id = 1 [(validate.rules).int32.gte = 1];
-}
-
-message PostBaseInfo {
-  int32 id = 1;
-  string title = 2;
-  string cover = 3;
-  repeated int32 tags = 4;
-  string description = 5;
-  int32 created_at = 6;
-  int32 updated_at = 7;
-  int32 category_id = 8;
-  int32 views = 9;
+  int32 post_id = 1 [(validate.rules).int32.gte = 1, json_name = "post_id"];
 }
 
 // 博客实体
 message Post {
-  PostBaseInfo base_info = 1;
-  string content = 2;
+  int32 id = 1 [json_name = "id"];
+  string title = 2 [json_name = "title"];
+  string cover = 3 [json_name = "cover"];
+  repeated int32 tags = 4 [json_name = "tags"];
+  string description = 5 [json_name = "description"];
+  int32 created_at = 6 [json_name = "created_at"];
+  int32 updated_at = 7 [json_name = "updated_at"];
+  int32 category_id = 8 [json_name = "category_id"];
+  int32 views = 9 [json_name = "views"];
+  string content = 10 [json_name = "content"];
 }
 
 message CreatePostRequest {
-  string title = 1;
-  string cover = 2;
-  repeated int32 tags = 3;
-  string description = 4;
-  int32 category_id = 5;
-  string content = 6;
+  string title = 1 [json_name = "title"];
+  string cover = 2 [json_name = "cover"];
+  repeated int32 tags = 3 [json_name = "tags"];
+  string description = 4 [json_name = "description"];
+  int32 category_id = 5 [json_name = "category_id"];
+  string content = 6 [json_name = "content"];
 }
 
 message UpdatePostRequest {
-  Post post = 1 [(validate.rules).message.required = true];
+  Post post = 1 [(validate.rules).message.required = true, json_name = "post"];
 }
 
 message DeletePostRequest {
-  int32 post_id = 1 [(validate.rules).int32.gt = 0];
+  int32 post_id = 1 [(validate.rules).int32.gt = 0, json_name = "post_id"];
 }

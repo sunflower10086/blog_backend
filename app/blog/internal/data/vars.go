@@ -4,6 +4,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var RecordNotFound = gorm.ErrRecordNotFound
+
 func Paginate(pageNum, pageSize int64) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 		if pageNum <= 0 {

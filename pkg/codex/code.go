@@ -37,8 +37,8 @@ const (
 	CodeRecQuestionCountExceeded100 ResCode = 403024
 	CodeTemplateEditing             ResCode = 403025
 
-	CodeUserNotExist   ResCode = 404001
-	CodeRecordNotFound ResCode = 404002
+	CodeUserNotExist ResCode = 404001
+	CodePostNotExist ResCode = 404002
 
 	CodeTplNameIsExist ResCode = 405001
 

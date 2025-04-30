@@ -3,6 +3,9 @@ package biz
 import (
 	"context"
 	"fmt"
+	"github.com/pkg/errors"
+	"gorm.io/gorm"
+	"sunflower-blog-svc/pkg/codex"
 	"sunflower-blog-svc/pkg/errx"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -55,6 +58,11 @@ func NewPosterUseCase(repo PosterRepo, logger log.Logger) *PosterUseCase {
 func (uc *PosterUseCase) GetPostInfo(ctx context.Context, id int64) (*Post, error) {
 	post, err := uc.repo.FindByID(ctx, id)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errx.New(codex.CodePostNotExist, codex.CodePostNotExist.Msg()).WithMetadata(map[string]string{
+				"post_id": fmt.Sprintf("%d", id),
+			})
+		}
 		return nil, errx.Internal(err, "查询帖子失败").WithMetadata(map[string]string{
 			"post_id": fmt.Sprintf("%d", id),
 		})

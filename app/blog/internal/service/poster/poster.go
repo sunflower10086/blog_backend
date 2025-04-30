@@ -40,9 +40,9 @@ func (s *PosterService) ListPosts(ctx context.Context, req *pb.ListPostsRequest)
 		return nil, err
 	}
 
-	postBaseInfoList := make([]*pb.PostBaseInfo, 0, len(posts))
+	postBaseInfoList := make([]*pb.Post, 0, len(posts))
 	for _, post := range posts {
-		postBaseInfoList = append(postBaseInfoList, &pb.PostBaseInfo{
+		postBaseInfoList = append(postBaseInfoList, &pb.Post{
 			Title:     post.Title,
 			Id:        int32(post.Id),
 			CreatedAt: int32(post.CreatedAt),
@@ -71,17 +71,15 @@ func (s *PosterService) GetPost(ctx context.Context, req *pb.GetPostRequest) (*p
 	}()
 
 	return &pb.Post{
-		BaseInfo: &pb.PostBaseInfo{
-			Title:      post.Title,
-			Id:         int32(post.Id),
-			CreatedAt:  int32(post.CreatedAt),
-			UpdatedAt:  int32(post.UpdatedAt),
-			Tags:       post.Tags,
-			CategoryId: int32(post.CategoryId),
-			Cover:      post.Cover,
-			Views:      int32(post.Views),
-		},
-		Content: post.Content,
+		Title:      post.Title,
+		Id:         int32(post.Id),
+		CreatedAt:  int32(post.CreatedAt),
+		UpdatedAt:  int32(post.UpdatedAt),
+		Tags:       post.Tags,
+		CategoryId: int32(post.CategoryId),
+		Cover:      post.Cover,
+		Views:      int32(post.Views),
+		Content:    post.Content,
 	}, nil
 }
 
@@ -103,31 +101,29 @@ func (s *PosterService) CreatePost(ctx context.Context, req *pb.CreatePostReques
 	}
 
 	resp := &pb.Post{
-		BaseInfo: &pb.PostBaseInfo{
-			Title:      post.Title,
-			Id:         int32(post.Id),
-			CreatedAt:  int32(time.Now().Unix()),
-			UpdatedAt:  int32(time.Now().Unix()),
-			Tags:       post.Tags,
-			CategoryId: int32(post.CategoryId),
-			Cover:      post.Cover,
-		},
+		Title:      post.Title,
+		Id:         int32(post.Id),
+		CreatedAt:  int32(time.Now().Unix()),
+		UpdatedAt:  int32(time.Now().Unix()),
+		Tags:       post.Tags,
+		CategoryId: int32(post.CategoryId),
+		Cover:      post.Cover,
 	}
 	return resp, nil
 }
 
 func (s *PosterService) UpdatePost(ctx context.Context, req *pb.UpdatePostRequest) (*pb.Post, error) {
-	if err := s.validateTagsAndCategoryIdExist(ctx, req.Post.BaseInfo.Tags, req.Post.BaseInfo.CategoryId); err != nil {
+	if err := s.validateTagsAndCategoryIdExist(ctx, req.Post.Tags, req.Post.CategoryId); err != nil {
 		return nil, err
 	}
 
 	bizPost := &biz.Post{
-		Id:         int64(req.Post.BaseInfo.Id),
-		Title:      req.Post.BaseInfo.Title,
+		Id:         int64(req.Post.Id),
+		Title:      req.Post.Title,
 		Content:    req.Post.Content,
-		Cover:      req.Post.BaseInfo.Cover,
-		Tags:       req.Post.BaseInfo.Tags,
-		CategoryId: int64(req.Post.BaseInfo.CategoryId),
+		Cover:      req.Post.Cover,
+		Tags:       req.Post.Tags,
+		CategoryId: int64(req.Post.CategoryId),
 	}
 
 	err := s.postUc.UpdatePost(ctx, bizPost)

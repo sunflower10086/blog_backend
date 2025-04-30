@@ -27,7 +27,7 @@ var codeMsgMap = map[ResCode]string{
 	CodeNotBanSelf:              "不能对自己进行操作",
 	CodeEmailTypeErr:            "邮箱格式错误",
 	CodeNeedAcceptAgreement:     "请先接受协议",
-	CodeRecordNotFound:          "没有符合条件的数据",
+	CodePostNotExist:            "帖子不存在",
 	CodeInValidImage:            "图片中没有识别到题目",
 	CodeRepeatPayment:           "请勿重复支付",
 

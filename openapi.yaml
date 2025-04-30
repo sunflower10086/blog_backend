@@ -54,14 +54,14 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/blog.v1.Post'
-    /api/v1/post/{postId}:
+    /api/v1/post/{post_id}:
         get:
             tags:
                 - Poster
             description: 获取单个博客详情
             operationId: Poster_GetPost
             parameters:
-                - name: postId
+                - name: post_id
                   in: path
                   required: true
                   schema:
@@ -79,7 +79,7 @@ paths:
                 - Poster
             operationId: Poster_DeletePost
             parameters:
-                - name: postId
+                - name: post_id
                   in: path
                   required: true
                   schema:
@@ -101,7 +101,7 @@ paths:
                   schema:
                     type: integer
                     format: int32
-                - name: pageSize
+                - name: page_size
                   in: query
                   schema:
                     type: integer
@@ -260,7 +260,7 @@ components:
                         format: int32
                 description:
                     type: string
-                categoryId:
+                category_id:
                     type: integer
                     format: int32
                 content:
@@ -293,7 +293,7 @@ components:
                 posts:
                     type: array
                     items:
-                        $ref: '#/components/schemas/blog.v1.PostBaseInfo'
+                        $ref: '#/components/schemas/blog.v1.Post'
                 total:
                     type: integer
                     format: int32
@@ -306,14 +306,6 @@ components:
                     items:
                         $ref: '#/components/schemas/blog.v1.Tag'
         blog.v1.Post:
-            type: object
-            properties:
-                baseInfo:
-                    $ref: '#/components/schemas/blog.v1.PostBaseInfo'
-                content:
-                    type: string
-            description: 博客实体
-        blog.v1.PostBaseInfo:
             type: object
             properties:
                 id:
@@ -330,22 +322,25 @@ components:
                         format: int32
                 description:
                     type: string
-                createdAt:
+                created_at:
                     type: integer
                     format: int32
-                updatedAt:
+                updated_at:
                     type: integer
                     format: int32
-                categoryId:
+                category_id:
                     type: integer
                     format: int32
                 views:
                     type: integer
                     format: int32
+                content:
+                    type: string
+            description: 博客实体
         blog.v1.StatTagsResp:
             type: object
             properties:
-                tagStat:
+                tag_stat:
                     type: array
                     items:
                         $ref: '#/components/schemas/blog.v1.StatTagsResp_TagStat'

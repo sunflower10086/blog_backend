@@ -38,16 +38,16 @@ service User {
 }
 
 message LoginRequest {
-  string account = 1;
-  string password = 2;
+  string account = 1 [json_name = "account"];
+  string password = 2 [json_name = "password"];
 }
 
 message LoginReply {
-  string token = 1;
+  string token = 1 [json_name = "token"];
 }
 
 message UserInfoReply {
-  string username = 1;
-  string email = 2;
-  string avatar = 3;
+  string username = 1 [json_name = "username"];
+  string email = 2 [json_name = "email"];
+  string avatar = 3 [json_name = "avatar"];
 }
