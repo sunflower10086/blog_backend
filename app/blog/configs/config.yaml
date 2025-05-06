@@ -7,6 +7,7 @@ server:
   grpc:
     addr: 0.0.0.0:9000
     timeout: 10s
+
 data:
   database:
     dsn: host=127.0.0.1 user=sunflower password=lz18738377974 dbname=blog port=5432 sslmode=disable TimeZone=Asia/Shanghai
@@ -18,6 +19,35 @@ data:
     addr: 127.0.0.1:6379
     read_timeout: 0.2s
     write_timeout: 0.2s
+
+mq:
+  kafka:
+    producers:
+      endpoint:
+        - 127.0.0.1:9092
+      items:
+        page_view:
+          topic: blog.page_views
+          retries: 3
+        like_action:
+          topic: blog.like_events
+          retries: 5  # 点赞需更高重试次数确保成功
+
+    consumers:
+      endpoint:
+        - 127.0.0.1:9092
+      items:
+        page_view_consumer:
+          topics:
+            - blog.page_views
+          groupId: blog-page-view-group
+          concurrency: 6  # 高并发处理浏览量
+        like_event_consumer:
+          topics:
+            - blog.like_events
+          groupId: blog-like-event-group
+          concurrency: 3
+
 log:
   ServiceName: sunflower-blog-svc-blog
   # 日志记录模式 console,file,volume, 默认 console

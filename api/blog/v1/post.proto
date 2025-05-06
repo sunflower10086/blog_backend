@@ -29,7 +29,7 @@ service Poster {
     option (google.api.http) = {
       delete: "/api/v1/post/{post_id}"
     };
-  };
+};
 
   // 获取博客列表
   rpc ListPosts (ListPostsRequest) returns (ListPostsResponse) {

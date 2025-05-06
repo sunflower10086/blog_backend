@@ -10,6 +10,7 @@ message Bootstrap {
   Data data = 2;
   Log log = 3;
   Jwt jwt = 4;
+  MQ mq = 5;
 }
 
 message Server {
@@ -45,6 +46,36 @@ message Postgres {
   int32 max_open_cons = 3;
   int32 max_idle_cons = 4;
   int32 create_batch_size = 5;
+}
+
+message MQ {
+  Kafka kafka = 1;
+}
+
+message Kafka {
+  message ProducersConfig {
+    repeated string endpoint = 1;
+    map<string, Producer> items = 2;
+  }
+  
+  message ConsumersConfig {
+    repeated string endpoint = 1;
+    map<string, Consumer> items = 2;
+  }
+  
+  ProducersConfig producers = 1;
+  ConsumersConfig consumers = 2;
+}
+
+message Producer {
+  string topic = 1;
+  int32 retries = 2;
+}
+
+message Consumer {
+  repeated string topics = 1;
+  string groupId = 2;
+  int32 concurrency = 3;
 }
 
 message Log {

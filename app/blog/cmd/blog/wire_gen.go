@@ -46,7 +46,8 @@ func wireApp(confServer *conf.Server, confData *conf.Data, bootstrap *conf.Boots
 	posterService := poster.NewPosterService(posterUseCase, tagUseCase, categoryUseCase, logger)
 	grpcServer := server.NewGRPCServer(confServer, userService, posterService, logger)
 	httpServer := server.NewHTTPServer(bootstrap, userService, posterService, logger)
-	app := newApp(logger, grpcServer, httpServer)
+	mqServer := server.NewMQServer(bootstrap, logger)
+	app := newApp(logger, grpcServer, httpServer, mqServer)
 	return app, func() {
 		cleanup2()
 		cleanup()
