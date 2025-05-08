@@ -1,11 +1,12 @@
 package httpencoder
 
 import (
-	"github.com/HiBugEnterprise/gotools/errorx"
+	stdhttp "net/http"
+
+	"sunflower-blog-svc/pkg/codex"
+
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/transport/http"
-	stdhttp "net/http"
-	"sunflower-blog-svc/pkg/codex"
 )
 
 type Response struct {
@@ -25,7 +26,7 @@ func ContentType(subtype string) string {
 func SuccessEncoder(w http.ResponseWriter, r *http.Request, resp interface{}) error {
 	var body Response
 	body.Code = stdhttp.StatusOK
-	body.Msg = errorx.CodeSuccess.Msg()
+	body.Msg = codex.CodeSuccess.Msg()
 
 	codec, _ := http.CodecForRequest(r, "Accept")
 	data, err := codec.Marshal(resp)
@@ -34,7 +35,7 @@ func SuccessEncoder(w http.ResponseWriter, r *http.Request, resp interface{}) er
 			Code: 500,
 			Msg:  codex.CodeInternalErr.Msg(),
 		}
-		var target *errors.Error
+		target := new(errors.Error)
 		if errors.As(err, target) {
 			body.Code = int(target.Code)
 			body.Msg = target.Message
@@ -48,7 +49,7 @@ func SuccessEncoder(w http.ResponseWriter, r *http.Request, resp interface{}) er
 		return err
 	}
 
-	var newData = make([]byte, 0, len(replyData)+len(data)+8)
+	newData := make([]byte, 0, len(replyData)+len(data)+8)
 	newData = append(newData, replyData[:len(replyData)-1]...)
 	newData = append(newData, []byte(`,"data":`)...)
 	newData = append(newData, data...)
@@ -82,6 +83,5 @@ func ErrorEncoder(w http.ResponseWriter, r *http.Request, err error) {
 		return
 	}
 
-	_, err = w.Write(data)
-	return
+	_, _ = w.Write(data)
 }

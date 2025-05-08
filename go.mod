@@ -3,7 +3,6 @@ module sunflower-blog-svc
 go 1.22.9
 
 require (
-	github.com/HiBugEnterprise/gotools v0.2.7
 	github.com/envoyproxy/protoc-gen-validate v1.0.4
 	github.com/go-kratos/kratos/contrib/log/zap/v2 v2.0.0-20241219093211-5087366d2f90
 	github.com/go-kratos/kratos/v2 v2.8.3

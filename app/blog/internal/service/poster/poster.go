@@ -3,13 +3,17 @@ package poster
 import (
 	"context"
 	"fmt"
+	"time"
+
+	"sunflower-blog-svc/app/blog/internal/service/mq"
 	"sunflower-blog-svc/pkg/codex"
 	"sunflower-blog-svc/pkg/errx"
-	"time"
+	pkgmq "sunflower-blog-svc/pkg/mq"
 
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	"sunflower-blog-svc/app/blog/internal/biz"
+	"sunflower-blog-svc/app/blog/internal/pkg/constants"
 
 	"github.com/go-kratos/kratos/v2/log"
 
@@ -18,6 +22,8 @@ import (
 
 type PosterService struct {
 	pb.UnimplementedPosterServer
+
+	senderFactory *mq.SenderFactory
 
 	postUc     *biz.PosterUseCase
 	tagUc      *biz.TagUseCase
@@ -49,6 +55,7 @@ func (s *PosterService) ListPosts(ctx context.Context, req *pb.ListPostsRequest)
 			UpdatedAt: int32(post.UpdatedAt),
 			Tags:      post.Tags,
 			Cover:     post.Cover,
+			Views:     int32(post.Views),
 		})
 	}
 
@@ -65,8 +72,16 @@ func (s *PosterService) GetPost(ctx context.Context, req *pb.GetPostRequest) (*p
 	}
 
 	go func() {
-		if inErr := s.postUc.IncrViews(context.Background(), int(req.PostId)); inErr != nil {
-			log.Errorf("增加帖子浏览量失败: %v", inErr)
+		// 异步发送消息
+		sender, err := s.senderFactory.GetSender(constants.MQProducerPageViewName)
+		if err != nil {
+			s.logger.Errorf("failed to get sender: %v", err)
+			return
+		}
+		inErr := sender.
+			Send(context.Background(), pkgmq.NewMessage("postID", []byte(fmt.Sprint(req.PostId))))
+		if inErr != nil {
+			s.logger.Errorf("failed to send message to kafka: %v", inErr)
 		}
 	}()
 

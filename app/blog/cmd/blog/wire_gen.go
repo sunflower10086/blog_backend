@@ -14,6 +14,7 @@ import (
 	"sunflower-blog-svc/app/blog/internal/data"
 	"sunflower-blog-svc/app/blog/internal/server"
 	"sunflower-blog-svc/app/blog/internal/service"
+	"sunflower-blog-svc/app/blog/internal/service/mq"
 	"sunflower-blog-svc/app/blog/internal/service/poster"
 )
 
@@ -46,7 +47,11 @@ func wireApp(confServer *conf.Server, confData *conf.Data, bootstrap *conf.Boots
 	posterService := poster.NewPosterService(posterUseCase, tagUseCase, categoryUseCase, logger)
 	grpcServer := server.NewGRPCServer(confServer, userService, posterService, logger)
 	httpServer := server.NewHTTPServer(bootstrap, userService, posterService, logger)
-	mqServer := server.NewMQServer(bootstrap, logger)
+	pageViewConsumer := mq.NewPageViewConsumer(posterUseCase)
+	likeActionConsumer := mq.NewLikeActionConsumer()
+	handlerRegistry := mq.NewHandlerRegistry(pageViewConsumer, likeActionConsumer)
+	senderFactory := mq.NewSenderFactory()
+	mqServer := server.NewMQServer(bootstrap, logger, handlerRegistry, senderFactory)
 	app := newApp(logger, grpcServer, httpServer, mqServer)
 	return app, func() {
 		cleanup2()
