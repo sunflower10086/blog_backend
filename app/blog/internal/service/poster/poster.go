@@ -31,12 +31,13 @@ type PosterService struct {
 	logger     *log.Helper
 }
 
-func NewPosterService(uc *biz.PosterUseCase, tagUc *biz.TagUseCase, categoryUc *biz.CategoryUseCase, logger log.Logger) *PosterService {
+func NewPosterService(uc *biz.PosterUseCase, tagUc *biz.TagUseCase, categoryUc *biz.CategoryUseCase, senderFactory *mq.SenderFactory, logger log.Logger) *PosterService {
 	return &PosterService{
-		postUc:     uc,
-		tagUc:      tagUc,
-		categoryUc: categoryUc,
-		logger:     log.NewHelper(log.With(logger, "service", "Post")),
+		postUc:        uc,
+		tagUc:         tagUc,
+		categoryUc:    categoryUc,
+		senderFactory: senderFactory,
+		logger:        log.NewHelper(log.With(logger, "service", "Post")),
 	}
 }
 
